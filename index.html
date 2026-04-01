@@ -3,209 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bioregional Trailblazer HUB</title>
-    <!-- CSS Dependencies -->
+    <title>Bioregional Trailblazer Campus</title>
+    <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,400;1,800&display=swap" rel="stylesheet">
-    
-    <!-- React & Babel CDNs -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .font-serif { font-family: 'Playfair Display', serif; }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+        .wisdom-card { border-left: 4px solid #0f172a; }
+        .activation-card { border-left: 4px solid #2563eb; }
+        
+        /* Smooth Fade In */
+        .page-enter { animation: pageEnter 0.6s ease-out forwards; }
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Prose styling for depth */
+        .prose p { margin-bottom: 1.25rem; line-height: 1.75; color: #334155; }
+        .prose h3 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 1rem; color: #0f172a; }
+        .prose ul, .prose ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+        .prose li { margin-bottom: 0.5rem; color: #475569; }
+        
+        /* Custom UI tweaks */
+        .glass-header { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background-color: rgba(255, 255, 255, 0.8); }
     </style>
 </head>
-<body class="bg-slate-50">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        // Custom Icon Component for UMD Lucide
-        const LucideIcon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [name]);
+        // --- ICON COMPONENT ---
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => { lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
+        // --- SHARED UI COMPONENTS ---
         const Card = ({ children, className = "" }) => (
-            <div class={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+            <div className={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
                 {children}
             </div>
         );
 
-        // --- INDIVIDUAL TOOLS ---
+        // --- LESSON WRAPPERS ---
+        const LessonView = ({ title, subtitle, wisdom, activation }) => (
+            <div className="page-enter space-y-10">
+                <header className="border-b border-slate-200 pb-6">
+                    <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600 mb-2">{subtitle}</h2>
+                    <h1 className="text-4xl font-serif italic text-slate-900">{title}</h1>
+                </header>
 
-        const WatershedTool = () => {
-            const [roof, setRoof] = useState(1000);
-            const [rain, setRain] = useState(30);
-            const yieldVal = Math.round(roof * rain * 0.623 * 0.85);
-            return (
-                <div class="space-y-6 animate-fade-in">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <Card class="p-8 space-y-4">
-                            <h3 class="font-black text-blue-600 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <LucideIcon name="droplets" /> Site Parameters
-                            </h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Roof Size (sq ft)</label>
-                                    <input type="number" value={roof} onChange={e => setRoof(e.target.value)} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Annual Rainfall (inches)</label>
-                                    <input type="number" value={rain} onChange={e => setRain(e.target.value)} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                            </div>
-                        </Card>
-                        <div class="bg-blue-600 rounded-[2rem] p-10 text-white flex flex-col justify-center text-center shadow-xl">
-                            <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Calculated Yield</span>
-                            <div class="text-6xl font-black my-2">{yieldVal.toLocaleString()}</div>
-                            <span class="text-xl font-bold opacity-80">Gallons / Year</span>
+                <div className="grid lg:grid-cols-2 gap-10">
+                    <div className="wisdom-card bg-white p-8 rounded-3xl shadow-sm border border-slate-100 prose max-w-none">
+                        <div className="flex items-center gap-2 mb-6 text-slate-400">
+                            <Icon name="book-open" size={16} />
+                            <span className="text-xs font-bold uppercase tracking-widest">The Wisdom</span>
                         </div>
+                        {wisdom}
+                    </div>
+
+                    <div className="activation-card bg-slate-900 text-white p-8 rounded-3xl shadow-2xl overflow-hidden relative">
+                        <div className="flex items-center gap-2 mb-8 text-blue-400">
+                            <Icon name="zap" size={16} />
+                            <span className="text-xs font-bold uppercase tracking-widest">The Activation</span>
+                        </div>
+                        <div className="relative z-10">{activation}</div>
+                        <Icon name="globe" size={300} className="absolute -bottom-20 -right-20 opacity-5 pointer-events-none" />
                     </div>
                 </div>
-            );
-        };
+            </div>
+        );
 
-        const CompostTool = () => {
-            const [browns, setBrowns] = useState(3);
-            const [greens, setGreens] = useState(2);
-            return (
-                <Card class="p-10 animate-fade-in">
-                    <div class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="space-y-8">
-                            <h3 class="font-black text-emerald-600 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <LucideIcon name="sprout" /> 3:2:1 Balancer
-                            </h3>
-                            <div class="space-y-6">
-                                <div>
-                                    <div class="flex justify-between text-[10px] font-black uppercase text-slate-400 mb-2">
-                                        <span>Carbon (Browns)</span>
-                                        <span class="text-emerald-600">{browns} Parts</span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={browns} onChange={e => setBrowns(e.target.value)} class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" />
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-[10px] font-black uppercase text-slate-400 mb-2">
-                                        <span>Nitrogen (Greens)</span>
-                                        <span class="text-emerald-600">{greens} Parts</span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={greens} onChange={e => setGreens(e.target.value)} class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" />
-                                </div>
+        // --- MODULE 1: THE METACRISIS (HEAD) ---
+        const HeadModule = () => (
+            <LessonView 
+                title="Meeting the New Elephant"
+                subtitle="Ecology & Mindset"
+                wisdom={(
+                    <div>
+                        <h3>The Global Shadow</h3>
+                        <p>Originally, we thought the "elephant in the room" was just personal trauma—divorce, grief, or hidden secrets. But as we sit here today, looking at the shifting seasons and the thinning ice, we realize there is an entire mountain range standing right behind it.</p>
+                        <p><strong>The Metacrisis:</strong> A convergence of interconnected crises—ecological breakdown, social fragmentation, and economic instability. It is driven by our collective denial of <strong>Ecological Overshoot</strong>.</p>
+                        <p><strong>The Myth of Infinite Growth:</strong> We live in a society that assumes we can extract resources endlessly from a finite planet. This is the "Cosmic Credit Card" that is finally being declined. To survive this bottleneck, we must move from <em>Self-Help</em> to <em>Systems-Health</em>.</p>
+                        <ul className="space-y-4">
+                            <li><strong>Energy Blindness:</strong> Failing to see the ancient geological sunlight (hydrocarbons) that currently keeps modernity "magic."</li>
+                            <li><strong>Shifting Baselines:</strong> Losing track of what a healthy ecosystem actually looks like because we only know the depleted one we inherited.</li>
+                        </ul>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-6">
+                        <p className="text-slate-400 text-sm italic">Calculate your Micro-Watershed annual yield to understand the currency of life in your specific place.</p>
+                        <div className="space-y-4 bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Roof Area (sq ft)</label>
+                                <input type="number" defaultValue="1000" className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
                             </div>
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Annual Rainfall (inches)</label>
+                                <input type="number" defaultValue="30" className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                            <button className="w-full bg-blue-600 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 transition-all">Calculate Yield</button>
                         </div>
-                        <div class="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 text-center">
-                            <div class="flex justify-center mb-4 text-emerald-600"><LucideIcon name="thermometer" size={48} /></div>
-                            <h4 class="text-xl font-black text-emerald-900 italic">Target: 135°F - 160°F</h4>
-                            <p class="text-xs text-emerald-700 mt-2 leading-relaxed">Turn on Day 4, then every 2 days for 18 total days (Berkeley Method).</p>
+                        <div className="p-4 bg-slate-800 rounded-xl text-center">
+                            <span className="text-[10px] font-black uppercase text-slate-500 block mb-1">Potential Harvest</span>
+                            <span className="text-3xl font-black text-blue-400">18,690 Gallons</span>
                         </div>
                     </div>
-                </Card>
-            );
-        };
+                )}
+            />
+        );
 
-        const EconomyTool = () => {
-            const [global, setGlobal] = useState(1200);
-            const [local, setLocal] = useState(400);
-            const rate = Math.round((local / (global + local)) * 100);
-            return (
-                <div class="space-y-6 animate-fade-in">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <Card class="p-8 space-y-6">
-                            <h3 class="font-black text-rose-500 uppercase text-xs tracking-widest">Dollar Leakage Audit</h3>
-                            <div class="space-y-4">
-                                <input type="number" value={global} onChange={e => setGlobal(Number(e.target.value))} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Global Monthly Spend" />
-                                <input type="number" value={local} onChange={e => setLocal(Number(e.target.value))} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Local Monthly Spend" />
+        // --- MODULE 2: REINHABITATION (PLACE) ---
+        const PlaceModule = () => (
+            <LessonView 
+                title="Finding Your Life-Place"
+                subtitle="Bioregional Mapping"
+                wisdom={(
+                    <div>
+                        <h3>The Process of Reinhabitation</h3>
+                        <p>A bioregion is not defined by zip codes or political lines. It is a "life-place" defined by the natural boundaries of the Earth—watersheds, soil types, and native ecosystems.</p>
+                        <p><strong>Reinhabitation</strong> means learning to live as a responsible, long-term steward of your specific home. It is the conscious decision to become "native" to your place, ensuring the seventh generation experiences its health as a birthright.</p>
+                        <p>By mapping your bioregion, you discover your <strong>Shadow Assets</strong>—the tools, skills, and natural capitals already present in your neighborhood that global supply chains have taught you to ignore.</p>
+                        <ul className="list-disc pl-5 space-y-2 text-slate-600 text-sm">
+                            <li><strong>Watershed:</strong> The primary unit of ecological governance.</li>
+                            <li><strong>Systemic Trust:</strong> Mutual aid networks built before the crisis.</li>
+                            <li><strong>Indigenous Ecological Wisdom:</strong> Learning from the traditional practices of those who lived in harmony with this land for millennia.</li>
+                        </ul>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-6">
+                        <h4 className="font-bold text-blue-400 uppercase text-xs tracking-widest">Regional Asset Log</h4>
+                        <div className="space-y-4">
+                            <div className="flex gap-2">
+                                <input placeholder="Resource (e.g. Seed Bank)" className="flex-1 p-3 bg-slate-800 border border-slate-700 rounded-xl" />
+                                <button className="bg-blue-600 px-6 rounded-xl font-black text-xs uppercase tracking-widest">LOG</button>
                             </div>
-                        </Card>
-                        <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white flex flex-col justify-center shadow-2xl relative overflow-hidden">
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Retention Score</span>
-                            <div class="text-7xl font-black my-4">{rate}%</div>
-                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden flex">
-                                <div class="bg-emerald-500 h-full" style={{ width: `${rate}%` }}></div>
-                                <div class="bg-rose-500 h-full" style={{ width: `${100-rate}%` }}></div>
+                            <div className="grid grid-cols-1 gap-2">
+                                <div className="p-4 bg-slate-800 rounded-xl border border-slate-700 flex justify-between">
+                                    <span className="text-sm">Community Tool Library</span>
+                                    <span className="text-blue-400 text-xs font-bold tracking-widest">STRENGTH: 3/3</span>
+                                </div>
+                                <div className="p-4 bg-slate-800 rounded-xl border border-slate-700 flex justify-between">
+                                    <span className="text-sm">Local Watershed Council</span>
+                                    <span className="text-blue-400 text-xs font-bold tracking-widest">STRENGTH: 2/3</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            );
-        };
+                )}
+            />
+        );
 
-        const LegacyTool = () => {
-            const [input, setInput] = useState('');
-            const [done, setDone] = useState(false);
-            return (
-                <Card class="bg-stone-800 p-12 text-center text-stone-100 animate-fade-in border-none">
-                    {!done ? (
-                        <div class="max-w-xl mx-auto space-y-8">
-                            <div class="text-amber-500 flex justify-center"><LucideIcon name="history" size={48} /></div>
-                            <h3 class="text-3xl font-serif italic">What gift from the ancestors do you carry into today?</h3>
-                            <input value={input} onChange={e => setInput(e.target.value)} class="w-full bg-transparent border-b border-stone-600 p-4 text-xl outline-none italic text-amber-200 focus:border-amber-500 text-center" placeholder="A value, a skill, a memory..." />
-                            <button onClick={() => setDone(true)} class="bg-amber-600 text-stone-900 px-12 py-3 rounded-full font-black uppercase text-xs tracking-widest">Enter the Stream</button>
+        // --- MODULE 3: ACTIVE HOPE (HEART) ---
+        const HeartModule = () => (
+            <LessonView 
+                title="The Spiral of Resilience"
+                subtitle="Inner Transformation"
+                wisdom={(
+                    <div>
+                        <h3>Active Hope vs. Passive Optimism</h3>
+                        <p>Optimism is a prediction that everything will be fine. <strong>Active Hope</strong> is a practice—a choice to engage in the "Great Turning" even in the face of uncertainty.</p>
+                        <p>We use the 4-stage Spiral from the <em>Work That Reconnects</em> to process the emotional weight of the metacrisis:</p>
+                        <ol className="space-y-4 text-sm">
+                            <li><strong>1. Coming from Gratitude:</strong> Grounding the mind by valuing what is worth protecting. Gratitude is the quiet energy that prevents burnout.</li>
+                            <li><strong>2. Honoring the Pain:</strong> Not suppressing grief or solastalgia (distress over environmental loss), but seeing it as proof of our connection to the web of life.</li>
+                            <li><strong>3. Seeing with New Eyes:</strong> Shifting from a mechanistic, reductionist worldview to a holistic <em>Systems-Health</em> view.</li>
+                            <li><strong>4. Going Forth:</strong> Identifying your unique <em>Biophilic Energy</em> and taking the smallest, most immediate local action.</li>
+                        </ol>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-8">
+                        <div className="p-8 bg-slate-800/50 rounded-3xl border border-slate-700 text-center">
+                            <Icon name="message-square" size={40} className="text-blue-400 mx-auto mb-4" />
+                            <p className="italic text-lg text-slate-200">"What is the one shared value you and your opponent both want to protect?"</p>
+                            <textarea className="w-full mt-6 bg-slate-900 p-4 rounded-xl border border-slate-700 outline-none focus:ring-2 focus:ring-blue-500 text-slate-300" placeholder="Reflect on social permaculture and conflict resolution..." />
+                            <button className="mt-4 bg-white text-slate-900 px-8 py-3 rounded-full font-black uppercase text-[10px] tracking-widest">Submit Reflection</button>
                         </div>
-                    ) : (
-                        <div class="max-w-2xl mx-auto space-y-8">
-                            <div class="text-rose-500 flex justify-center"><LucideIcon name="heart" size={48} /></div>
-                            <div class="p-10 bg-stone-900/50 rounded-3xl border-l-4 border-amber-600 text-left">
-                                <p class="text-xl italic font-serif leading-relaxed">
-                                    "I acknowledge the gift of <span class="text-amber-200 underline">{input}</span>. Today, in this moment of metacrisis, I commit my biophilic energy to the restoration of this Life-Place for the next seven generations."
-                                </p>
+                    </div>
+                )}
+            />
+        );
+
+        // --- MODULE 4: FERTILITY (HANDS) ---
+        const HandsModule = () => (
+            <LessonView 
+                title="The Engine of Fertility"
+                subtitle="Regenerative Skills"
+                wisdom={(
+                    <div>
+                        <h3>Closing the Loop</h3>
+                        <p>In the Localization Movement, there is no "away." Every bit of organic waste is natural capital that can be turned into fertility using the <strong>Master Compost Pile</strong>.</p>
+                        <p><strong>The 3-2-1 Mantra:</strong></p>
+                        <ul className="space-y-4">
+                            <li><strong>3 Parts Carbon (Browns):</strong> Dry leaves, straw, woodchips. This is the structural "battery" of the pile.</li>
+                            <li><strong>2 Parts Nitrogen (Greens):</strong> Food scraps, fresh grass, garden waste. This is the "fuel" for the micro-organisms.</li>
+                            <li><strong>1 Part Activator:</strong> Manure, comfrey, or coffee grounds. This provides the "spark" that triggers thermophilic decomposition.</li>
+                        </ul>
+                        <p>Success is measured by heat. High-heat thermophilic activity (135°F-160°F) mimics the forest floor's renewal process, killing pathogens and building soil structure.</p>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-amber-800 h-20 rounded-xl flex items-center justify-center text-[10px] font-black uppercase shadow-lg">Carbon</div>
+                            <div className="bg-emerald-600 h-20 rounded-xl flex items-center justify-center text-[10px] font-black uppercase shadow-lg">Nitrogen</div>
+                            <div className="bg-emerald-900 h-20 rounded-xl flex items-center justify-center text-[10px] font-black uppercase shadow-lg">Activator</div>
+                        </div>
+                        <div className="space-y-6 bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+                             <div className="flex justify-between text-xs font-bold uppercase text-slate-400">
+                                <span>Biological Balance</span>
+                                <span className="text-blue-400 italic">Optimum: Thermophilic</span>
+                             </div>
+                             <div className="w-full bg-slate-900 h-6 rounded-full overflow-hidden flex shadow-inner">
+                                <div className="bg-amber-800 w-1/2"></div>
+                                <div className="bg-emerald-600 w-1/3"></div>
+                                <div className="bg-emerald-900 w-1/6"></div>
+                             </div>
+                             <p className="text-[10px] text-slate-500 text-center uppercase tracking-widest italic">Mimicking the Forest Floor Pattern</p>
+                        </div>
+                    </div>
+                )}
+            />
+        );
+
+        // --- MODULE 5: THE WALLET (ECONOMY) ---
+        const WalletModule = () => (
+            <LessonView 
+                title="Plugging the Leaky Bucket"
+                subtitle="Bioregional Economy"
+                wisdom={(
+                    <div>
+                        <h3>The Economics of Happiness</h3>
+                        <p>Our current global economy is like a leaky bucket. We earn resources only for them to "leak" out immediately to distant shareholders. Localization seeks to <strong>plug those leaks</strong>.</p>
+                        <p><strong>The Multiplier Effect:</strong> When you spend a dollar at a local farmer, they spend it at a local mechanic, who spends it at a local carpenter. That dollar "turns" 3 to 7 times, creating exponential wealth within your watershed.</p>
+                        <p>In contrast, a dollar spent at a global big-box retailer leaks out 80-90% of its value within 24 hours. True wealth is measured by <strong>Gross National Happiness (GNH)</strong>, which includes ecological health and community connection.</p>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-8 text-center">
+                        <div className="p-10 bg-slate-800/50 rounded-[2rem] border border-slate-700 shadow-xl">
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400 block mb-4">Retention Score</span>
+                            <div className="text-8xl font-black mb-4 tabular-nums">25%</div>
+                            <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-6">
+                                <div className="bg-blue-600 h-full w-1/4"></div>
                             </div>
-                            <button onClick={() => setDone(false)} class="text-stone-500 uppercase text-[10px] font-black tracking-widest hover:text-white transition-colors">Start New Cycle</button>
+                            <p className="text-sm text-slate-400 leading-relaxed italic max-w-sm mx-auto">"You are currently exporting 75% of your energy to global systems. Strategy: Substitute one global expense for a local collective this month."</p>
                         </div>
-                    )}
-                </Card>
-            );
-        };
+                    </div>
+                )}
+            />
+        );
 
-        // --- MAIN APP SHELL ---
+        // --- MODULE 6: THE VISION (DEEP TIME) ---
+        const VisionModule = () => (
+            <LessonView 
+                title="The Ancestral Covenant"
+                subtitle="Deep Time Vision"
+                wisdom={(
+                    <div>
+                        <h3>The Breath of the Past</h3>
+                        <p>You are a continuation of 14 billion years of cosmic creativity. You are not just a consumer; you are the <strong>Ancestor of the Future</strong>.</p>
+                        <p><strong>Deep Time Literacy:</strong> Modern choices are often made in seconds, yet they leave physical marks for centuries. A plastic bottle lasts 500 years; an oak tree planted today lives for 300. We must filter our choices through the lens of the next seven generations.</p>
+                        <p><strong>Cosmic Legacy:</strong> Your true impact isn't measured in memories alone, but in the chemical and physical changes you leave in the biosphere. Will you leave a footprint of extraction or a covenant of restoration?</p>
+                    </div>
+                )}
+                activation={(
+                    <div className="space-y-8">
+                        <div className="p-10 bg-blue-600 rounded-[2.5rem] shadow-2xl text-left border-l-8 border-white italic relative overflow-hidden">
+                            <Icon name="history" size={100} className="absolute -top-10 -right-10 text-white/10" />
+                            <p className="text-xl font-serif leading-relaxed text-white relative z-10">"I acknowledge the gifts passed down by my ancestors. In this era of overshoot, I commit my creative power to the restoration of this Life-Place, ensuring that children born 200 years from now experience clean water as their birthright."</p>
+                            <button className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 transition-all shadow-lg">Activate Ritual Activation</button>
+                        </div>
+                    </div>
+                )}
+            />
+        );
+
+        // --- MAIN APPLICATION SHELL ---
 
         function App() {
             const [tab, setTab] = useState('overview');
 
             const menu = [
-                { id: 'overview', label: 'Overview', icon: 'layout-dashboard', color: 'text-slate-500' },
-                { id: 'watershed', label: 'Ecology', icon: 'droplets', color: 'text-blue-500' },
-                { id: 'soil', label: 'Fertility', icon: 'sprout', color: 'text-emerald-500' },
-                { id: 'economy', label: 'Wallet', icon: 'trending-down', color: 'text-rose-500' },
-                { id: 'legacy', label: 'Vision', icon: 'hourglass', color: 'text-amber-500' }
+                { id: 'overview', label: 'Dashboard', icon: 'layout-dashboard' },
+                { id: 'head', label: '1. Mindset', icon: 'brain' },
+                { id: 'place', label: '2. Place', icon: 'map-pin' },
+                { id: 'heart', label: '3. Soul', icon: 'heart' },
+                { id: 'hands', label: '4. Skills', icon: 'sprout' },
+                { id: 'wallet', label: '5. Economy', icon: 'trending-up' },
+                { id: 'vision', label: '6. Legacy', icon: 'history' }
             ];
 
-            const render = () => {
+            const renderContent = () => {
                 switch(tab) {
-                    case 'watershed': return <WatershedTool />;
-                    case 'soil': return <CompostTool />;
-                    case 'economy': return <EconomyTool />;
-                    case 'legacy': return <LegacyTool />;
+                    case 'head': return <HeadModule />;
+                    case 'place': return <PlaceModule />;
+                    case 'heart': return <HeartModule />;
+                    case 'hands': return <HandsModule />;
+                    case 'wallet': return <WalletModule />;
+                    case 'vision': return <VisionModule />;
                     default: return (
-                        <div class="space-y-8 animate-fade-in">
-                            <div class="grid md:grid-cols-3 gap-6">
-                                <Card class="p-6 border-l-4 border-blue-500"><div class="flex items-center gap-4"><div class="p-3 bg-blue-50 text-blue-600 rounded-2xl"><LucideIcon name="droplets" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Water potential</p><p class="text-xl font-black">18.4K Gal</p></div></div></Card>
-                                <Card class="p-6 border-l-4 border-emerald-500"><div class="flex items-center gap-4"><div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><LucideIcon name="sprout" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Soil Fitness</p><p class="text-xl font-black">Optimum</p></div></div></Card>
-                                <Card class="p-6 border-l-4 border-rose-500"><div class="flex items-center gap-4"><div class="p-3 bg-rose-50 text-rose-600 rounded-2xl"><LucideIcon name="trending-up" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Retention</p><p class="text-xl font-black">+12.4%</p></div></div></Card>
-                            </div>
-                            <div class="bg-slate-900 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
-                                <div class="max-w-xl relative z-10">
-                                    <h2 class="text-5xl font-black italic tracking-tighter mb-6 leading-none">Welcome Explorer.</h2>
-                                    <p class="text-slate-400 text-lg leading-relaxed mb-10">This dashboard is your interface with the living world. Move beyond the static screen and start mapping the <strong>Life-Place</strong> where you stand.</p>
-                                    <button onClick={() => setTab('watershed')} class="bg-white text-slate-900 px-10 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform flex items-center gap-2">Activate Action Map <LucideIcon name="arrow-right" size={16} /></button>
+                        <div className="page-enter space-y-8">
+                            <header className="bg-slate-900 text-white p-12 rounded-[3rem] relative overflow-hidden shadow-2xl">
+                                <div className="max-w-2xl relative z-10">
+                                    <h1 className="text-5xl font-serif italic mb-6 leading-none tracking-tighter">Welcome, Bioregional Explorer.</h1>
+                                    <p className="text-slate-400 text-xl leading-relaxed mb-10 italic">"The Metacrisis is not a death sentence; it is a Planetary Call to Adventure. It is time to step out of the static screen and into the Life-Place where you stand."</p>
+                                    <button onClick={() => setTab('head')} className="bg-white text-slate-900 px-10 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform flex items-center gap-2">Begin Expedition <Icon name="arrow-right" size={16} /></button>
                                 </div>
-                                <div class="absolute -bottom-20 -right-20 opacity-5 text-white pointer-events-none"><LucideIcon name="globe" size={400} /></div>
+                                <Icon name="globe" size={400} className="absolute -bottom-20 -right-20 text-white opacity-5 pointer-events-none" />
+                            </header>
+
+                            <div className="grid md:grid-cols-3 gap-6">
+                                <Card className="p-8">
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Curriculum Progress</h4>
+                                    <div className="text-3xl font-black tracking-tighter">Level 2: Navigator</div>
+                                    <div className="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                        <div className="bg-blue-600 w-1/3 h-full"></div>
+                                    </div>
+                                </Card>
+                                <Card className="p-8">
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Local Retention</h4>
+                                    <div className="text-3xl font-black tracking-tighter">25% Retained</div>
+                                    <div className="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                        <div className="bg-blue-600 w-1/4 h-full"></div>
+                                    </div>
+                                </Card>
+                                <Card className="p-8">
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Soil Fitness</h4>
+                                    <div className="text-3xl font-black tracking-tighter">Optimum (Hot)</div>
+                                    <div className="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                        <div className="bg-blue-600 w-full h-full"></div>
+                                    </div>
+                                </Card>
                             </div>
                         </div>
                     );
@@ -213,33 +354,49 @@
             };
 
             return (
-                <div class="min-h-screen flex text-slate-900">
-                    <aside class="w-20 md:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
-                        <div class="p-8 border-b border-slate-50 hidden md:block">
-                            <div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center"><LucideIcon name="globe" /></div><span class="font-black uppercase tracking-tighter italic">Trailblazer</span></div>
+                <div className="min-h-screen flex text-slate-900">
+                    <aside className="w-20 md:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0">
+                        <div className="p-10 border-b border-slate-50 hidden md:block">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200">
+                                    <Icon name="compass" size={24} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-black uppercase tracking-tighter italic text-xl">Trailblazer</span>
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] leading-none">Campus Core</span>
+                                </div>
+                            </div>
                         </div>
-                        <nav class="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto">
+                        <nav className="flex-1 py-8 px-5 space-y-2 overflow-y-auto">
                             {menu.map(i => (
-                                <button key={i.id} onClick={() => setTab(i.id)} class={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${tab === i.id ? 'bg-slate-900 text-white shadow-xl translate-x-1' : 'text-slate-500 hover:bg-slate-100'}`}>
-                                    <span class={tab === i.id ? 'text-white' : i.color}><LucideIcon name={i.icon} /></span>
-                                    <span class="hidden md:block text-[10px] font-black uppercase tracking-widest">{i.label}</span>
+                                <button key={i.id} onClick={() => setTab(i.id)} className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${tab === i.id ? 'bg-slate-900 text-white shadow-xl shadow-slate-200 translate-x-2' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
+                                    <Icon name={i.icon} className={tab === i.id ? 'text-blue-400' : ''} />
+                                    <span className="hidden md:block font-black text-[11px] uppercase tracking-widest">{i.label}</span>
                                 </button>
                             ))}
                         </nav>
+                        <div className="p-8 border-t border-slate-50 hidden md:block">
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">"Weaving Resilience"</p>
+                                <p className="text-[11px] font-bold text-slate-600">v2.0 • Systems-Health</p>
+                            </div>
+                        </div>
                     </aside>
-                    <main class="flex-1 overflow-y-auto bg-slate-50/30">
-                        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 py-6 sticky top-0 z-20 flex justify-between items-center">
-                            <h1 class="text-xl font-black italic tracking-tight">Bioregional HUB</h1>
-                            <div class="hidden md:flex gap-4">
-                                <div class="bg-slate-100 px-5 py-2 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div> Local Watershed: <span class="text-slate-900">Mapped</span>
-                                </div>
+
+                    <main className="flex-1 overflow-y-auto bg-slate-50/50 relative">
+                        <header className="glass-header border-b border-slate-200 px-12 py-8 sticky top-0 z-20 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Explorer Session: Active</span>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-sm">U</div>
                             </div>
                         </header>
-                        <div class="p-10 max-w-6xl mx-auto min-h-screen">{render()}</div>
-                        <footer class="p-10 border-t border-slate-200 text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex justify-between">
+                        <div className="p-12 max-w-7xl mx-auto min-h-screen">{renderContent()}</div>
+                        <footer className="p-12 border-t border-slate-200 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.5em] text-slate-300 italic">
                             <span>Dancing with the Elephant</span>
-                            <span>v2.0 Systems-Health</span>
+                            <span>(c) 2026 Shift</span>
                         </footer>
                     </main>
                 </div>
