@@ -1,0 +1,443 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  LayoutDashboard, 
+  Droplets, 
+  Sprout, 
+  MapPin, 
+  Users, 
+  TrendingDown, 
+  Hourglass, 
+  TreeDeciduous, 
+  MessageCircle,
+  ChevronRight,
+  Info,
+  Calendar,
+  Thermometer,
+  Calculator,
+  PieChart,
+  RefreshCw,
+  History,
+  Sparkles,
+  Mountain,
+  Heart,
+  Search,
+  BookOpen,
+  ArrowRight,
+  RotateCcw,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  Wind,
+  Layers,
+  Zap,
+  Globe
+} from 'lucide-react';
+
+// --- SUB-COMPONENTS: THE TOOLS ---
+
+// 1. Watershed Navigator
+const WatershedNavigator = () => {
+  const [roofSize, setRoofSize] = useState(1000);
+  const [annualRainfall, setAnnualRainfall] = useState(30);
+  const [efficiency, setEfficiency] = useState(0.85);
+
+  const potentialHarvest = useMemo(() => {
+    return Math.round(roofSize * annualRainfall * 0.623 * efficiency);
+  }, [roofSize, annualRainfall, efficiency]);
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 className="font-bold flex items-center gap-2 text-blue-600"><Calculator size={18} /> Yield Inputs</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Roof Size (sq ft)</label>
+              <input type="number" value={roofSize} onChange={e => setRoofSize(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Annual Rain (inches)</label>
+              <input type="number" value={annualRainfall} onChange={e => setAnnualRainfall(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surface Type</label>
+              <select value={efficiency} onChange={e => setEfficiency(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200">
+                <option value={0.95}>Metal (95%)</option>
+                <option value={0.85}>Asphalt (85%)</option>
+                <option value={0.50}>Pavement (50%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="bg-blue-600 text-white p-8 rounded-2xl flex flex-col items-center justify-center text-center">
+          <span className="text-xs font-black uppercase tracking-widest opacity-80">Annual Potential</span>
+          <div className="text-5xl font-black my-2">{potentialHarvest.toLocaleString()}</div>
+          <span className="text-xl font-bold opacity-90">Gallons / Year</span>
+        </div>
+      </div>
+      <div className="bg-slate-900 text-white p-6 rounded-2xl">
+        <h4 className="font-bold mb-2 flex items-center gap-2"><Wind size={16} /> Reading the Pattern</h4>
+        <p className="text-sm text-slate-400">Walk your land during a storm. Observe where the "dendritic" flow lines form. That is your primary design roadmap.</p>
+      </div>
+    </div>
+  );
+};
+
+// 2. Compost Maker
+const CompostMaker = () => {
+  const [inputs, setInputs] = useState({ browns: 3, greens: 2, activators: 1 });
+  
+  const fitness = useMemo(() => {
+    const total = inputs.browns + inputs.greens + inputs.activators;
+    if (inputs.browns < inputs.greens) return { text: "Too much nitrogen!", color: "text-amber-500" };
+    if (inputs.browns > (inputs.greens + inputs.activators) * 3) return { text: "Too much carbon!", color: "text-blue-400" };
+    return { text: "Perfect 3-2-1 Balance", color: "text-emerald-500" };
+  }, [inputs]);
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <h3 className="font-bold flex items-center gap-2 text-emerald-600"><Sprout size={18} /> Ingredient Balancer</h3>
+          <div className="space-y-4">
+            {['browns', 'greens', 'activators'].map(key => (
+              <div key={key}>
+                <div className="flex justify-between text-xs font-bold mb-1 uppercase text-slate-500">
+                  <span>{key}</span>
+                  <span>{inputs[key]} Parts</span>
+                </div>
+                <input type="range" min="0" max="10" step="1" value={inputs[key]} onChange={e => setInputs({...inputs, [key]: parseInt(e.target.value)})} className="w-full accent-emerald-600" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-xl border border-slate-100">
+          <span className={`text-xl font-black uppercase italic ${fitness.color}`}>{fitness.text}</span>
+          <p className="text-xs text-slate-500 mt-4 text-center">Maintain 135°F - 160°F for thermophilic biological activity.</p>
+          <div className="flex gap-2 mt-6">
+            <div className="w-10 h-10 bg-amber-800 rounded-lg" title="Carbon" />
+            <div className="w-10 h-10 bg-emerald-500 rounded-lg" title="Greens" />
+            <div className="w-10 h-10 bg-emerald-900 rounded-lg" title="Nitrogen" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 3. Asset Mapper
+const AssetMapper = () => {
+  const [assets, setAssets] = useState([
+    { id: 1, name: 'Tool Library', category: 'Tools', strength: 3 },
+    { id: 2, name: 'Seed Bank', category: 'Food', strength: 2 }
+  ]);
+  const [name, setName] = useState('');
+
+  const add = () => { if(name) { setAssets([...assets, { id: Date.now(), name, category: 'Skill', strength: 2 }]); setName(''); }};
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="flex gap-2">
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Asset Name..." className="flex-1 p-3 rounded-xl border border-slate-200" />
+        <button onClick={add} className="bg-indigo-600 text-white px-6 rounded-xl font-black">LOG</button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {assets.map(a => (
+          <div key={a.id} className="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+            <div>
+              <p className="font-black text-slate-800">{a.name}</p>
+              <p className="text-[10px] uppercase font-bold text-slate-400">{a.category}</p>
+            </div>
+            <div className="flex gap-1">
+              {[1,2,3].map(i => <div key={i} className={`w-1.5 h-1.5 rounded-full ${i <= a.strength ? 'bg-indigo-500' : 'bg-slate-200'}`} />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// 4. Conflict Guide (Socratic)
+const ConflictGuide = () => {
+  const [step, setStep] = useState(0);
+  const prompts = [
+    "What is the one shared value you and your opponent both want to protect?",
+    "Shift to 'Systems Health': What systemic stress might be causing their reaction?",
+    "What is the smallest gesture you can make to restore trust today?"
+  ];
+
+  return (
+    <div className="bg-neutral-900 text-white p-8 rounded-3xl animate-in fade-in duration-500">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="font-black italic uppercase tracking-widest text-rose-500">Social Permaculture</h3>
+        <span className="text-xs font-bold text-neutral-500">Step {step + 1} of 3</span>
+      </div>
+      <p className="text-xl font-light italic mb-8">"{prompts[step]}"</p>
+      <textarea className="w-full bg-neutral-800 border border-neutral-700 rounded-xl p-4 text-neutral-300 mb-6" rows="3" placeholder="Reflect here..." />
+      <div className="flex justify-between">
+        <button onClick={() => setStep(Math.max(0, step - 1))} className="text-neutral-500 font-bold uppercase text-xs">Back</button>
+        <button onClick={() => setStep(Math.min(2, step + 1))} className="bg-white text-black px-6 py-2 rounded-full font-black uppercase text-xs tracking-widest">Next Phase</button>
+      </div>
+    </div>
+  );
+};
+
+// 5. Guild Planner
+const GuildPlanner = () => {
+  const [guild, setGuild] = useState(['Apple Tree']);
+  const supports = ['Comfrey', 'Clover', 'Nasturtium', 'Yarrow', 'Chives'];
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="bg-stone-50 border border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center">
+        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-200">
+          <TreeDeciduous size={48} className="text-emerald-700" />
+        </div>
+        <h3 className="text-2xl font-black uppercase italic text-emerald-900">{guild[0]}</h3>
+        <div className="flex flex-wrap justify-center gap-2 mt-6">
+          {guild.slice(1).map(g => (
+            <span key={g} className="bg-white px-4 py-2 rounded-full border border-emerald-100 text-xs font-bold text-emerald-800 shadow-sm flex items-center gap-2">
+              <CheckCircle2 size={12} /> {g}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {supports.map(s => (
+          <button 
+            key={s}
+            onClick={() => !guild.includes(s) && setGuild([...guild, s])}
+            className={`p-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${guild.includes(s) ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-400 border-slate-200 hover:border-emerald-300'}`}
+          >
+            + {s}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// 6. Economy Mapper
+const EconomyMapper = () => {
+  const [global, setGlobal] = useState(1200);
+  const [local, setLocal] = useState(400);
+  const leakRate = Math.round((global / (global + local)) * 100);
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 text-center">
+          <span className="text-[10px] font-black uppercase text-rose-500 tracking-tighter">Global Leakage</span>
+          <div className="text-3xl font-black text-rose-700 mt-1">${global}</div>
+        </div>
+        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 text-center">
+          <span className="text-[10px] font-black uppercase text-emerald-500 tracking-tighter">Local Retention</span>
+          <div className="text-3xl font-black text-emerald-700 mt-1">${local}</div>
+        </div>
+      </div>
+      <div className="bg-slate-900 p-8 rounded-3xl text-white">
+        <div className="flex justify-between items-end mb-4">
+          <div>
+            <h3 className="text-lg font-black uppercase italic text-emerald-400">Retention Score</h3>
+            <p className="text-xs text-slate-500">How much energy stays in your bioregion?</p>
+          </div>
+          <span className="text-4xl font-black">{100 - leakRate}%</span>
+        </div>
+        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div className="bg-emerald-500 h-full" style={{ width: `${100 - leakRate}%` }} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 7. Ancestral Legacy
+const AncestralLegacy = () => {
+  const [val, setVal] = useState('');
+  const [done, setDone] = useState(false);
+
+  return (
+    <div className="bg-stone-800 text-stone-100 p-8 rounded-3xl border border-stone-700 animate-in fade-in duration-500 text-center">
+      {!done ? (
+        <div className="space-y-8">
+          <div className="p-6 bg-stone-900/50 rounded-full inline-block border border-stone-600">
+            <History size={40} className="text-amber-500" />
+          </div>
+          <h3 className="text-2xl font-light italic">The Breath of the Past</h3>
+          <p className="text-stone-400 text-sm leading-relaxed max-w-md mx-auto italic">
+            What is one gift from the thousands of generations before you that you carry into this moment of metacrisis?
+          </p>
+          <input value={val} onChange={e => setVal(e.target.value)} className="w-full bg-transparent border-b border-stone-600 text-center p-2 italic outline-none focus:border-amber-500" placeholder="A specific skill, a value, a love..." />
+          <button onClick={() => setDone(true)} className="bg-amber-600 text-stone-900 px-10 py-3 rounded-full font-black uppercase tracking-widest text-xs">Enter the Stream</button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <Heart size={40} className="text-rose-500 mx-auto" />
+          <h3 className="text-2xl font-light italic">Your Bioregional Covenant</h3>
+          <div className="p-6 bg-stone-900/40 rounded-2xl border border-stone-700 text-left italic text-stone-300 leading-relaxed">
+            "I acknowledge the gift of <span className="text-amber-200 font-bold underline">{val}</span> passed down from the ancestors. Today, I commit my biophilic energy to this land."
+          </div>
+          <button onClick={() => setDone(false)} className="text-stone-500 font-bold uppercase text-[10px] tracking-widest">New Cycle</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- MAIN HUB APPLICATION ---
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  const menuItems = [
+    { id: 'dashboard', label: 'Overview', icon: <LayoutDashboard size={20} />, color: 'text-slate-500' },
+    { id: 'watershed', label: 'Ecology', icon: <Droplets size={20} />, color: 'text-blue-500' },
+    { id: 'soil', label: 'Fertility', icon: <Sprout size={20} />, color: 'text-emerald-500' },
+    { id: 'assets', label: 'Resources', icon: <MapPin size={20} />, color: 'text-indigo-500' },
+    { id: 'social', label: 'Social', icon: <Users size={20} />, color: 'text-purple-500' },
+    { id: 'design', label: 'Design', icon: <TreeDeciduous size={20} />, color: 'text-emerald-600' },
+    { id: 'economy', label: 'Wallet', icon: <TrendingDown size={20} />, color: 'text-emerald-700' },
+    { id: 'legacy', label: 'Vision', icon: <Hourglass size={20} />, color: 'text-amber-500' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-100 flex font-sans text-slate-900">
+      
+      {/* Sidebar - Navigation */}
+      <aside className="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+        <div className="p-6 border-b border-slate-100 hidden md:block">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+              <Globe className="text-white" size={18} />
+            </div>
+            <span className="font-black uppercase tracking-tighter text-sm italic">Trailblazer HUB</span>
+          </div>
+        </div>
+
+        <nav className="flex-1 py-4 px-3 space-y-1">
+          {menuItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <span className={activeTab === item.id ? 'text-white' : item.color}>{item.icon}</span>
+              <span className="hidden md:block font-bold text-sm">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-100 opacity-50 hidden md:block">
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">v2.0 • Systems-Health</p>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto">
+        
+        {/* Top Header */}
+        <header className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 flex justify-between items-center">
+          <div>
+            <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
+              {menuItems.find(i => i.id === activeTab)?.label}
+            </h2>
+            <h1 className="text-xl font-black text-slate-800">Bioregional Command Center</h1>
+          </div>
+          <div className="flex gap-4">
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-200 text-xs font-bold text-slate-500">
+              <MapPin size={12} /> Local Watershed: <span className="text-slate-900">Unmapped</span>
+            </div>
+            <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-black text-slate-400">
+              U
+            </div>
+          </div>
+        </header>
+
+        <div className="p-8 max-w-5xl mx-auto">
+          
+          {activeTab === 'dashboard' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              {/* Hero Stats */}
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                  <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Droplets /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-slate-400">Water Harvest</p>
+                    <p className="text-xl font-black">18,450 Gal</p>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                  <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600"><Sprout /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-slate-400">Soil Fitness</p>
+                    <p className="text-xl font-black">Optimum</p>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
+                  <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600"><TrendingDown /></div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-slate-400">Retained Wealth</p>
+                    <p className="text-xl font-black">$425 / Mo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Welcome Card */}
+              <div className="bg-slate-900 text-white p-10 rounded-3xl relative overflow-hidden">
+                <div className="relative z-10 max-w-lg">
+                  <h2 className="text-3xl font-black italic tracking-tighter mb-4">Welcome, Bioregional Explorer.</h2>
+                  <p className="text-slate-400 leading-relaxed">
+                    This dashboard is your interface with reality. Move beyond the "Static Screen" of modern consumption and start mapping the "Life-Place" where you stand. Every tool in the sidebar is a lever for systemic health.
+                  </p>
+                  <button onClick={() => setActiveTab('watershed')} className="mt-8 flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all">
+                    Start Mapping <ChevronRight size={16} />
+                  </button>
+                </div>
+                <Globe className="absolute -bottom-10 -right-10 w-64 h-64 text-white opacity-5 pointer-events-none" />
+              </div>
+
+              {/* Quick Links */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200">
+                  <h3 className="font-black uppercase italic text-xs text-slate-400 mb-4">Latest Study Guide Chapter</h3>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-16 bg-slate-100 rounded border border-slate-200 flex items-center justify-center"><BookOpen size={20} className="text-slate-400" /></div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-sm">Chapter 5: Deep Time & Ancestral Legacy</h4>
+                      <p className="text-xs text-slate-500 mt-1">Filtering daily choices for the next 7 generations.</p>
+                      <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                        <div className="bg-amber-500 w-3/4 h-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200">
+                  <h3 className="font-black uppercase italic text-xs text-slate-400 mb-4">Campus Activity Log</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> You logged "Tool Library" to the Asset Map.
+                    </li>
+                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> New "Watershed Yield" calculated.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'watershed' && <WatershedNavigator />}
+          {activeTab === 'soil' && <CompostMaker />}
+          {activeTab === 'assets' && <AssetMapper />}
+          {activeTab === 'social' && <ConflictGuide />}
+          {activeTab === 'design' && <GuildPlanner />}
+          {activeTab === 'economy' && <EconomyMapper />}
+          {activeTab === 'legacy' && <AncestralLegacy />}
+
+        </div>
+      </main>
+    </div>
+  );
+}
