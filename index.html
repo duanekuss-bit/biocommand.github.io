@@ -20,8 +20,6 @@ import {
   Sparkles,
   Mountain,
   Heart,
-  Search,
-  BookOpen,
   ArrowRight,
   RotateCcw,
   Plus,
@@ -31,12 +29,21 @@ import {
   Wind,
   Layers,
   Zap,
-  Globe
+  Globe,
+  BookOpen
 } from 'lucide-react';
 
-// --- SUB-COMPONENTS: THE TOOLS ---
+// --- SHARED UI COMPONENTS ---
 
-// 1. Watershed Navigator
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+    {children}
+  </div>
+);
+
+// --- TOOL COMPONENTS ---
+
+// 1. Watershed Navigator (Ecology)
 const WatershedNavigator = () => {
   const [roofSize, setRoofSize] = useState(1000);
   const [annualRainfall, setAnnualRainfall] = useState(30);
@@ -47,171 +54,204 @@ const WatershedNavigator = () => {
   }, [roofSize, annualRainfall, efficiency]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 className="font-bold flex items-center gap-2 text-blue-600"><Calculator size={18} /> Yield Inputs</h3>
-          <div className="space-y-3">
+        <Card className="p-6 space-y-4">
+          <h3 className="font-black flex items-center gap-2 text-blue-600 uppercase tracking-wider text-sm">
+            <Calculator size={18} /> Yield Inputs
+          </h3>
+          <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Roof Size (sq ft)</label>
-              <input type="number" value={roofSize} onChange={e => setRoofSize(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200" />
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Catchment Area (sq ft)</label>
+              <input type="number" value={roofSize} onChange={e => setRoofSize(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Annual Rain (inches)</label>
-              <input type="number" value={annualRainfall} onChange={e => setAnnualRainfall(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200" />
+              <input type="number" value={annualRainfall} onChange={e => setAnnualRainfall(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surface Type</label>
-              <select value={efficiency} onChange={e => setEfficiency(Number(e.target.value))} className="w-full p-2 bg-slate-50 rounded-lg border border-slate-200">
-                <option value={0.95}>Metal (95%)</option>
-                <option value={0.85}>Asphalt (85%)</option>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surface Efficiency</label>
+              <select value={efficiency} onChange={e => setEfficiency(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none">
+                <option value={0.95}>Metal Roof (95%)</option>
+                <option value={0.85}>Asphalt Shingle (85%)</option>
                 <option value={0.50}>Pavement (50%)</option>
               </select>
             </div>
           </div>
-        </div>
-        <div className="bg-blue-600 text-white p-8 rounded-2xl flex flex-col items-center justify-center text-center">
-          <span className="text-xs font-black uppercase tracking-widest opacity-80">Annual Potential</span>
-          <div className="text-5xl font-black my-2">{potentialHarvest.toLocaleString()}</div>
+        </Card>
+        <div className="bg-blue-600 text-white p-10 rounded-3xl flex flex-col items-center justify-center text-center shadow-lg">
+          <span className="text-xs font-black uppercase tracking-[0.2em] opacity-80">Annual Water Yield</span>
+          <div className="text-6xl font-black my-2 tabular-nums">{potentialHarvest.toLocaleString()}</div>
           <span className="text-xl font-bold opacity-90">Gallons / Year</span>
+          <div className="mt-6 w-full bg-blue-500/50 h-2 rounded-full overflow-hidden">
+            <div className="bg-white h-full w-2/3" />
+          </div>
         </div>
-      </div>
-      <div className="bg-slate-900 text-white p-6 rounded-2xl">
-        <h4 className="font-bold mb-2 flex items-center gap-2"><Wind size={16} /> Reading the Pattern</h4>
-        <p className="text-sm text-slate-400">Walk your land during a storm. Observe where the "dendritic" flow lines form. That is your primary design roadmap.</p>
       </div>
     </div>
   );
 };
 
-// 2. Compost Maker
+// 2. Compost Pile Maker (Fertility)
 const CompostMaker = () => {
   const [inputs, setInputs] = useState({ browns: 3, greens: 2, activators: 1 });
   
-  const fitness = useMemo(() => {
+  const analysis = useMemo(() => {
     const total = inputs.browns + inputs.greens + inputs.activators;
-    if (inputs.browns < inputs.greens) return { text: "Too much nitrogen!", color: "text-amber-500" };
-    if (inputs.browns > (inputs.greens + inputs.activators) * 3) return { text: "Too much carbon!", color: "text-blue-400" };
-    return { text: "Perfect 3-2-1 Balance", color: "text-emerald-500" };
+    if (inputs.browns < inputs.greens) return { text: "Nitrogen Heavy: Add Carbon", color: "text-amber-500", bg: "bg-amber-50" };
+    if (inputs.browns > (inputs.greens + inputs.activators) * 3) return { text: "Carbon Heavy: Add Nitrogen", color: "text-blue-400", bg: "bg-blue-50" };
+    return { text: "Optimized 3-2-1 Ratio", color: "text-emerald-500", bg: "bg-emerald-50" };
   }, [inputs]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <h3 className="font-bold flex items-center gap-2 text-emerald-600"><Sprout size={18} /> Ingredient Balancer</h3>
-          <div className="space-y-4">
-            {['browns', 'greens', 'activators'].map(key => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <Card className="p-8 grid md:grid-cols-2 gap-10">
+        <div className="space-y-8">
+          <h3 className="font-black flex items-center gap-2 text-emerald-600 uppercase tracking-wider text-sm">
+            <Layers size={18} /> Component Balancer
+          </h3>
+          <div className="space-y-6">
+            {Object.keys(inputs).map(key => (
               <div key={key}>
-                <div className="flex justify-between text-xs font-bold mb-1 uppercase text-slate-500">
-                  <span>{key}</span>
-                  <span>{inputs[key]} Parts</span>
+                <div className="flex justify-between text-xs font-black mb-2 uppercase text-slate-500 tracking-widest">
+                  <span>{key === 'browns' ? 'Carbon (Browns)' : key === 'greens' ? 'Nitrogen (Greens)' : 'Activators (Manure)'}</span>
+                  <span className="text-emerald-700">{inputs[key]} Parts</span>
                 </div>
-                <input type="range" min="0" max="10" step="1" value={inputs[key]} onChange={e => setInputs({...inputs, [key]: parseInt(e.target.value)})} className="w-full accent-emerald-600" />
+                <input type="range" min="0" max="10" step="1" value={inputs[key]} onChange={e => setInputs({...inputs, [key]: parseInt(e.target.value)})} className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" />
               </div>
             ))}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-xl border border-slate-100">
-          <span className={`text-xl font-black uppercase italic ${fitness.color}`}>{fitness.text}</span>
-          <p className="text-xs text-slate-500 mt-4 text-center">Maintain 135°F - 160°F for thermophilic biological activity.</p>
-          <div className="flex gap-2 mt-6">
-            <div className="w-10 h-10 bg-amber-800 rounded-lg" title="Carbon" />
-            <div className="w-10 h-10 bg-emerald-500 rounded-lg" title="Greens" />
-            <div className="w-10 h-10 bg-emerald-900 rounded-lg" title="Nitrogen" />
+        <div className={`flex flex-col items-center justify-center p-8 rounded-3xl border border-slate-100 shadow-inner ${analysis.bg}`}>
+          <div className="p-4 bg-white rounded-full mb-4 shadow-sm">
+            <Thermometer size={32} className={analysis.color} />
           </div>
+          <span className={`text-xl font-black uppercase italic text-center ${analysis.color}`}>{analysis.text}</span>
+          <p className="text-xs text-slate-500 mt-4 text-center leading-relaxed">
+            Target high-heat: <strong>135°F - 160°F</strong>. This destroys weed seeds and pathogens while accelerating the "Great Cycle."
+          </p>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
 
-// 3. Asset Mapper
+// 3. Asset Mapper (Resources)
 const AssetMapper = () => {
   const [assets, setAssets] = useState([
-    { id: 1, name: 'Tool Library', category: 'Tools', strength: 3 },
-    { id: 2, name: 'Seed Bank', category: 'Food', strength: 2 }
+    { id: 1, name: 'Watershed Council', category: 'Nature', strength: 3 },
+    { id: 2, name: 'Tool Library', category: 'Tools', strength: 2 }
   ]);
   const [name, setName] = useState('');
+  const [category, setCategory] = useState('Skill');
 
-  const add = () => { if(name) { setAssets([...assets, { id: Date.now(), name, category: 'Skill', strength: 2 }]); setName(''); }};
+  const add = () => { 
+    if(name) { 
+      setAssets([{ id: Date.now(), name, category, strength: 2 }, ...assets]); 
+      setName(''); 
+    }
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex gap-2">
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Asset Name..." className="flex-1 p-3 rounded-xl border border-slate-200" />
-        <button onClick={add} className="bg-indigo-600 text-white px-6 rounded-xl font-black">LOG</button>
-      </div>
-      <div className="grid md:grid-cols-2 gap-4">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <Card className="p-6 flex flex-col md:flex-row gap-3">
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Asset Name (e.g. Seed Bank)" className="flex-1 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500" />
+        <select value={category} onChange={e => setCategory(e.target.value)} className="p-3 rounded-xl border border-slate-200 outline-none">
+          <option>Skill</option>
+          <option>Food</option>
+          <option>Water</option>
+          <option>Tools</option>
+          <option>Nature</option>
+        </select>
+        <button onClick={add} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all">Log Asset</button>
+      </Card>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {assets.map(a => (
-          <div key={a.id} className="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+          <Card key={a.id} className="p-5 flex justify-between items-center group hover:border-indigo-300 transition-colors">
             <div>
-              <p className="font-black text-slate-800">{a.name}</p>
-              <p className="text-[10px] uppercase font-bold text-slate-400">{a.category}</p>
+              <p className="font-black text-slate-800 tracking-tight">{a.name}</p>
+              <p className="text-[10px] uppercase font-bold text-slate-400 mt-1">{a.category}</p>
             </div>
             <div className="flex gap-1">
-              {[1,2,3].map(i => <div key={i} className={`w-1.5 h-1.5 rounded-full ${i <= a.strength ? 'bg-indigo-500' : 'bg-slate-200'}`} />)}
+              {[1,2,3].map(i => <div key={i} className={`w-2 h-2 rounded-full ${i <= a.strength ? 'bg-indigo-500' : 'bg-slate-100'}`} />)}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     </div>
   );
 };
 
-// 4. Conflict Guide (Socratic)
+// 4. Conflict to Connection Guide (Social)
 const ConflictGuide = () => {
   const [step, setStep] = useState(0);
   const prompts = [
-    "What is the one shared value you and your opponent both want to protect?",
-    "Shift to 'Systems Health': What systemic stress might be causing their reaction?",
-    "What is the smallest gesture you can make to restore trust today?"
+    { title: "Grounding", text: "What is the one shared value you and your opponent both want to protect?", detail: "Come from Gratitude. Remind yourself what is worth the effort of resolution." },
+    { title: "Systems Health", text: "What systemic stress might be causing their behavior?", detail: "Look beyond personality. Are they reacting to resource scarcity or fear?" },
+    { title: "Going Forth", text: "What is the smallest gesture you can make to restore trust today?", detail: "Apply 'Small and Slow Solutions' to social friction." }
   ];
 
   return (
-    <div className="bg-neutral-900 text-white p-8 rounded-3xl animate-in fade-in duration-500">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="font-black italic uppercase tracking-widest text-rose-500">Social Permaculture</h3>
-        <span className="text-xs font-bold text-neutral-500">Step {step + 1} of 3</span>
+    <Card className="bg-neutral-900 text-white p-10 animate-in zoom-in-95 duration-500 relative overflow-hidden">
+      <div className="relative z-10">
+        <div className="mb-8 flex items-center justify-between">
+          <h3 className="font-black italic uppercase tracking-[0.2em] text-rose-500 text-sm">Social Permaculture</h3>
+          <span className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Phase {step + 1} of 3</span>
+        </div>
+        <div className="space-y-2 mb-10">
+          <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">{prompts[step].title}</h4>
+          <p className="text-2xl font-light italic text-white leading-relaxed">"{prompts[step].text}"</p>
+        </div>
+        <textarea className="w-full bg-neutral-800 border border-neutral-700 rounded-2xl p-5 text-neutral-200 mb-8 outline-none focus:ring-2 focus:ring-rose-500 transition-all placeholder:text-neutral-600" rows="3" placeholder="Write your reflection..." />
+        <div className="flex justify-between items-center">
+          <button onClick={() => setStep(Math.max(0, step - 1))} className="text-neutral-500 hover:text-white font-black uppercase text-xs tracking-widest transition-colors">Back</button>
+          <div className="text-xs italic text-neutral-500 max-w-[200px] text-center hidden md:block">
+            {prompts[step].detail}
+          </div>
+          <button onClick={() => setStep(Math.min(2, step + 1))} className="bg-white text-neutral-900 px-8 py-3 rounded-full font-black uppercase text-xs tracking-[0.2em] hover:bg-neutral-200 active:scale-95 transition-all">Next Phase</button>
+        </div>
       </div>
-      <p className="text-xl font-light italic mb-8">"{prompts[step]}"</p>
-      <textarea className="w-full bg-neutral-800 border border-neutral-700 rounded-xl p-4 text-neutral-300 mb-6" rows="3" placeholder="Reflect here..." />
-      <div className="flex justify-between">
-        <button onClick={() => setStep(Math.max(0, step - 1))} className="text-neutral-500 font-bold uppercase text-xs">Back</button>
-        <button onClick={() => setStep(Math.min(2, step + 1))} className="bg-white text-black px-6 py-2 rounded-full font-black uppercase text-xs tracking-widest">Next Phase</button>
-      </div>
-    </div>
+      <Heart className="absolute -bottom-20 -right-20 w-80 h-80 text-white/5 pointer-events-none" />
+    </Card>
   );
 };
 
-// 5. Guild Planner
+// 5. Guild Planner (Design)
 const GuildPlanner = () => {
   const [guild, setGuild] = useState(['Apple Tree']);
-  const supports = ['Comfrey', 'Clover', 'Nasturtium', 'Yarrow', 'Chives'];
+  const supports = [
+    { name: 'Comfrey', role: 'Mineral Miner' },
+    { name: 'Clover', role: 'Nitrogen Fixer' },
+    { name: 'Nasturtium', role: 'Pest Trap' },
+    { name: 'Yarrow', role: 'Insectary' },
+    { name: 'Chives', role: 'Confuser' }
+  ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="bg-stone-50 border border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center">
-        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-200">
-          <TreeDeciduous size={48} className="text-emerald-700" />
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <Card className="bg-stone-50 p-12 text-center flex flex-col items-center relative overflow-hidden">
+        <div className="w-32 h-32 bg-emerald-100 rounded-full flex items-center justify-center mb-6 border-4 border-white shadow-lg relative z-10">
+          <TreeDeciduous size={64} className="text-emerald-700" />
         </div>
-        <h3 className="text-2xl font-black uppercase italic text-emerald-900">{guild[0]}</h3>
-        <div className="flex flex-wrap justify-center gap-2 mt-6">
+        <h3 className="text-3xl font-black uppercase italic text-emerald-900 tracking-tighter relative z-10">{guild[0]}</h3>
+        <div className="flex flex-wrap justify-center gap-2 mt-8 relative z-10">
           {guild.slice(1).map(g => (
-            <span key={g} className="bg-white px-4 py-2 rounded-full border border-emerald-100 text-xs font-bold text-emerald-800 shadow-sm flex items-center gap-2">
-              <CheckCircle2 size={12} /> {g}
-            </span>
+            <div key={g} className="bg-white px-5 py-2.5 rounded-full border border-emerald-100 text-xs font-black text-emerald-800 shadow-sm flex items-center gap-2 animate-in zoom-in duration-300">
+              <CheckCircle2 size={14} className="text-emerald-500" /> {g}
+            </div>
           ))}
         </div>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <Wind className="absolute top-0 right-0 w-64 h-64 text-emerald-100/50 -mr-20 -mt-20 pointer-events-none" />
+      </Card>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {supports.map(s => (
           <button 
-            key={s}
-            onClick={() => !guild.includes(s) && setGuild([...guild, s])}
-            className={`p-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${guild.includes(s) ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-400 border-slate-200 hover:border-emerald-300'}`}
+            key={s.name}
+            onClick={() => !guild.includes(s.name) && setGuild([...guild, s.name])}
+            className={`p-4 rounded-2xl border text-left transition-all ${guild.includes(s.name) ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg' : 'bg-white text-slate-400 border-slate-200 hover:border-emerald-300'}`}
           >
-            + {s}
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">{s.role}</p>
+            <p className="font-bold text-sm">{s.name}</p>
           </button>
         ))}
       </div>
@@ -219,7 +259,7 @@ const GuildPlanner = () => {
   );
 };
 
-// 6. Economy Mapper
+// 6. Economy Mapper (Wallet)
 const EconomyMapper = () => {
   const [global, setGlobal] = useState(1200);
   const [local, setLocal] = useState(400);
@@ -227,66 +267,89 @@ const EconomyMapper = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 text-center">
-          <span className="text-[10px] font-black uppercase text-rose-500 tracking-tighter">Global Leakage</span>
-          <div className="text-3xl font-black text-rose-700 mt-1">${global}</div>
-        </div>
-        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 text-center">
-          <span className="text-[10px] font-black uppercase text-emerald-500 tracking-tighter">Local Retention</span>
-          <div className="text-3xl font-black text-emerald-700 mt-1">${local}</div>
-        </div>
-      </div>
-      <div className="bg-slate-900 p-8 rounded-3xl text-white">
-        <div className="flex justify-between items-end mb-4">
-          <div>
-            <h3 className="text-lg font-black uppercase italic text-emerald-400">Retention Score</h3>
-            <p className="text-xs text-slate-500">How much energy stays in your bioregion?</p>
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-8 space-y-6">
+          <h3 className="font-black flex items-center gap-2 text-rose-500 uppercase tracking-wider text-sm">
+            <TrendingDown size={18} /> Leakage Audit
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Global Spend (Monthly)</label>
+              <input type="number" value={global} onChange={e => setGlobal(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Local Spend (Monthly)</label>
+              <input type="number" value={local} onChange={e => setLocal(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200" />
+            </div>
           </div>
-          <span className="text-4xl font-black">{100 - leakRate}%</span>
-        </div>
-        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-          <div className="bg-emerald-500 h-full" style={{ width: `${100 - leakRate}%` }} />
+          <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex gap-3 items-start">
+            <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-800 leading-relaxed italic">
+              "When you spend locally, that dollar 'turns' 3-7 times in your watershed before leaking. Global spending is an immediate 100% loss of regional energy."
+            </p>
+          </div>
+        </Card>
+        <div className="bg-slate-900 text-white p-10 rounded-3xl flex flex-col justify-center space-y-8 shadow-xl">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">Regional Retention Score</span>
+            <div className="text-7xl font-black mt-2">{100 - leakRate}%</div>
+          </div>
+          <div className="space-y-2">
+            <div className="w-full bg-slate-800 h-4 rounded-full overflow-hidden flex">
+               <div className="bg-emerald-500 h-full" style={{ width: `${100 - leakRate}%` }} />
+               <div className="bg-rose-500 h-full" style={{ width: `${leakRate}%` }} />
+            </div>
+            <div className="flex justify-between text-[10px] font-black uppercase text-slate-500 tracking-widest">
+              <span>Community Wealth</span>
+              <span>Corporate Leakage</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// 7. Ancestral Legacy
+// 7. Ancestral Legacy (Vision)
 const AncestralLegacy = () => {
   const [val, setVal] = useState('');
   const [done, setDone] = useState(false);
 
   return (
-    <div className="bg-stone-800 text-stone-100 p-8 rounded-3xl border border-stone-700 animate-in fade-in duration-500 text-center">
+    <Card className="bg-stone-800 text-stone-100 p-12 border border-stone-700 animate-in zoom-in duration-700 text-center min-h-[400px] flex flex-col justify-center">
       {!done ? (
-        <div className="space-y-8">
-          <div className="p-6 bg-stone-900/50 rounded-full inline-block border border-stone-600">
-            <History size={40} className="text-amber-500" />
+        <div className="space-y-10">
+          <div className="p-8 bg-stone-900/50 rounded-full inline-block border border-stone-600 shadow-inner">
+            <History size={48} className="text-amber-500 animate-pulse" />
           </div>
-          <h3 className="text-2xl font-light italic">The Breath of the Past</h3>
-          <p className="text-stone-400 text-sm leading-relaxed max-w-md mx-auto italic">
-            What is one gift from the thousands of generations before you that you carry into this moment of metacrisis?
-          </p>
-          <input value={val} onChange={e => setVal(e.target.value)} className="w-full bg-transparent border-b border-stone-600 text-center p-2 italic outline-none focus:border-amber-500" placeholder="A specific skill, a value, a love..." />
-          <button onClick={() => setDone(true)} className="bg-amber-600 text-stone-900 px-10 py-3 rounded-full font-black uppercase tracking-widest text-xs">Enter the Stream</button>
+          <div className="space-y-4">
+            <h3 className="text-3xl font-light italic">The Breath of the Past</h3>
+            <p className="text-stone-400 text-sm leading-relaxed max-w-md mx-auto italic">
+              What is one gift from the thousands of generations before you that you carry into this moment of Metacrisis?
+            </p>
+          </div>
+          <div className="max-w-md mx-auto w-full">
+            <input value={val} onChange={e => setVal(e.target.value)} className="w-full bg-transparent border-b-2 border-stone-600 text-center p-3 text-xl italic outline-none focus:border-amber-500 transition-colors placeholder:text-stone-700" placeholder="A skill, a value, a love..." />
+          </div>
+          <button onClick={() => setDone(true)} className="bg-amber-600 text-stone-900 px-12 py-4 rounded-full font-black uppercase tracking-[0.2em] text-xs hover:bg-amber-500 transition-all shadow-xl hover:scale-105 active:scale-95">Enter the Stream</button>
         </div>
       ) : (
-        <div className="space-y-6">
-          <Heart size={40} className="text-rose-500 mx-auto" />
-          <h3 className="text-2xl font-light italic">Your Bioregional Covenant</h3>
-          <div className="p-6 bg-stone-900/40 rounded-2xl border border-stone-700 text-left italic text-stone-300 leading-relaxed">
-            "I acknowledge the gift of <span className="text-amber-200 font-bold underline">{val}</span> passed down from the ancestors. Today, I commit my biophilic energy to this land."
+        <div className="space-y-8 animate-in fade-in duration-1000">
+          <Heart size={48} className="text-rose-500 mx-auto" />
+          <h3 className="text-3xl font-light italic tracking-tight">Your Bioregional Covenant</h3>
+          <div className="p-10 bg-stone-900/60 rounded-3xl border border-stone-700 text-left italic text-stone-300 text-lg leading-relaxed shadow-inner max-w-2xl mx-auto border-l-4 border-l-amber-600">
+            "I acknowledge the gift of <span className="text-amber-200 font-bold underline decoration-amber-600/50">{val}</span> passed down from the ancestors who survived. In this era of overshoot, I commit my biophilic energy to the restoration of this land for the next seven generations."
           </div>
-          <button onClick={() => setDone(false)} className="text-stone-500 font-bold uppercase text-[10px] tracking-widest">New Cycle</button>
+          <button onClick={() => setDone(false)} className="text-stone-500 hover:text-white font-black uppercase text-[10px] tracking-[0.3em] flex items-center justify-center gap-2 mx-auto transition-colors">
+            <RotateCcw size={12} /> New Vision Cycle
+          </button>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
-// --- MAIN HUB APPLICATION ---
+// --- MAIN DASHBOARD SHELL ---
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -298,145 +361,164 @@ export default function App() {
     { id: 'assets', label: 'Resources', icon: <MapPin size={20} />, color: 'text-indigo-500' },
     { id: 'social', label: 'Social', icon: <Users size={20} />, color: 'text-purple-500' },
     { id: 'design', label: 'Design', icon: <TreeDeciduous size={20} />, color: 'text-emerald-600' },
-    { id: 'economy', label: 'Wallet', icon: <TrendingDown size={20} />, color: 'text-emerald-700' },
+    { id: 'economy', label: 'Wallet', icon: <TrendingDown size={20} />, color: 'text-rose-500' },
     { id: 'legacy', label: 'Vision', icon: <Hourglass size={20} />, color: 'text-amber-500' },
   ];
 
-  return (
-    <div className="min-h-screen bg-slate-100 flex font-sans text-slate-900">
-      
-      {/* Sidebar - Navigation */}
-      <aside className="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
-        <div className="p-6 border-b border-slate-100 hidden md:block">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-              <Globe className="text-white" size={18} />
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'watershed': return <WatershedNavigator />;
+      case 'soil': return <CompostMaker />;
+      case 'assets': return <AssetMapper />;
+      case 'social': return <ConflictGuide />;
+      case 'design': return <GuildPlanner />;
+      case 'economy': return <EconomyMapper />;
+      case 'legacy': return <AncestralLegacy />;
+      default: return (
+        <div className="space-y-8 animate-in fade-in duration-500">
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="p-6 flex items-center gap-4 border-l-4 border-l-blue-500">
+              <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Droplets /></div>
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Water Potential</p>
+                <p className="text-xl font-black">18,450 Gal</p>
+              </div>
+            </Card>
+            <Card className="p-6 flex items-center gap-4 border-l-4 border-l-emerald-500">
+              <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600"><Sprout /></div>
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Soil Fitness</p>
+                <p className="text-xl font-black">Optimum</p>
+              </div>
+            </Card>
+            <Card className="p-6 flex items-center gap-4 border-l-4 border-l-indigo-500">
+              <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600"><TrendingDown /></div>
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Local Retention</p>
+                <p className="text-xl font-black">25% Shift</p>
+              </div>
+            </Card>
+          </div>
+
+          <div className="bg-slate-900 text-white p-12 rounded-[2rem] relative overflow-hidden shadow-2xl">
+            <div className="relative z-10 max-w-lg">
+              <h2 className="text-4xl font-black italic tracking-tighter mb-6 leading-tight">Welcome, Bioregional Explorer.</h2>
+              <p className="text-slate-400 text-lg leading-relaxed mb-10">
+                This dashboard is your interface with the living world. Move beyond the static screen and start mapping the "Life-Place" where you stand. Every tool in the sidebar is a lever for **Systems-Health**.
+              </p>
+              <button onClick={() => setActiveTab('watershed')} className="flex items-center gap-3 bg-white text-slate-900 px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all hover:translate-x-1 shadow-lg">
+                Activate Action Map <ArrowRight size={18} />
+              </button>
             </div>
-            <span className="font-black uppercase tracking-tighter text-sm italic">Trailblazer HUB</span>
+            <Globe className="absolute -bottom-20 -right-20 w-96 h-96 text-white opacity-5 pointer-events-none" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="p-8 space-y-6">
+              <h3 className="font-black uppercase italic text-xs text-slate-400 tracking-[0.2em] mb-4">Community Library Update</h3>
+              <div className="flex items-start gap-5">
+                <div className="w-16 h-20 bg-slate-100 rounded-xl border-2 border-slate-200 flex items-center justify-center shadow-sm">
+                  <BookOpen size={24} className="text-slate-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-black text-slate-800 text-lg tracking-tight">Chapter 5: Deep Time</h4>
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">Filtering choices for the next seven generations.</p>
+                  <div className="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden shadow-inner">
+                    <div className="bg-amber-500 w-3/4 h-full" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-8 space-y-6">
+              <h3 className="font-black uppercase italic text-xs text-slate-400 tracking-[0.2em] mb-4">Regional Activity Log</h3>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3 text-xs font-bold text-slate-600">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full" /> <span>You logged <strong>Tool Library</strong> to the Asset Map.</span>
+                </li>
+                <li className="flex items-center gap-3 text-xs font-bold text-slate-600">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full" /> <span>New <strong>Rainwater Yield</strong> calculated for local grid.</span>
+                </li>
+                <li className="flex items-center gap-3 text-xs font-bold text-slate-600 opacity-50">
+                  <div className="w-2 h-2 bg-slate-300 rounded-full" /> <span>Conflict mediation session initialized.</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100 flex font-sans text-slate-900 selection:bg-indigo-100">
+      
+      {/* Sidebar Navigation */}
+      <aside className="w-20 md:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
+        <div className="p-8 border-b border-slate-50 hidden md:block">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <Globe className="text-white" size={22} />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black uppercase tracking-tighter text-sm italic">Trailblazer</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Command Center</span>
+            </div>
           </div>
         </div>
 
-        <nav className="flex-1 py-4 px-3 space-y-1">
+        <nav className="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto">
           {menuItems.map(item => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group ${activeTab === item.id ? 'bg-slate-900 text-white shadow-xl translate-x-1' : 'text-slate-500 hover:bg-slate-50'}`}
             >
-              <span className={activeTab === item.id ? 'text-white' : item.color}>{item.icon}</span>
-              <span className="hidden md:block font-bold text-sm">{item.label}</span>
+              <span className={`transition-colors ${activeTab === item.id ? 'text-white' : item.color} group-hover:scale-110 transition-transform`}>{item.icon}</span>
+              <span className="hidden md:block font-black text-xs uppercase tracking-widest">{item.label}</span>
+              {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full hidden md:block" />}
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-100 opacity-50 hidden md:block">
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">v2.0 • Systems-Health</p>
+        <div className="p-6 border-t border-slate-50 hidden md:block">
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+             <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em] mb-1">Status: Active</p>
+             <p className="text-[10px] font-bold text-slate-600">v2.0 • Systems-Health</p>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
-        
-        {/* Top Header */}
-        <header className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 flex justify-between items-center">
+      {/* Content Area */}
+      <main className="flex-1 overflow-y-auto bg-slate-50/50">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 py-5 sticky top-0 z-20 flex justify-between items-center">
           <div>
-            <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
+            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">
               {menuItems.find(i => i.id === activeTab)?.label}
             </h2>
-            <h1 className="text-xl font-black text-slate-800">Bioregional Command Center</h1>
+            <h1 className="text-xl font-black text-slate-900 tracking-tight italic">Bioregional Trailblazer HUB</h1>
           </div>
           <div className="flex gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-200 text-xs font-bold text-slate-500">
-              <MapPin size={12} /> Local Watershed: <span className="text-slate-900">Unmapped</span>
+            <div className="hidden lg:flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-2xl border border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              Watershed: <span className="text-slate-900 ml-1">Hudson Valley (Sub-4)</span>
             </div>
-            <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-black text-slate-400">
+            <div className="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-lg cursor-pointer hover:bg-black transition-colors">
               U
             </div>
           </div>
         </header>
 
-        <div className="p-8 max-w-5xl mx-auto">
-          
-          {activeTab === 'dashboard' && (
-            <div className="space-y-8 animate-in fade-in duration-500">
-              {/* Hero Stats */}
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
-                  <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Droplets /></div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400">Water Harvest</p>
-                    <p className="text-xl font-black">18,450 Gal</p>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
-                  <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600"><Sprout /></div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400">Soil Fitness</p>
-                    <p className="text-xl font-black">Optimum</p>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4">
-                  <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600"><TrendingDown /></div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400">Retained Wealth</p>
-                    <p className="text-xl font-black">$425 / Mo</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Welcome Card */}
-              <div className="bg-slate-900 text-white p-10 rounded-3xl relative overflow-hidden">
-                <div className="relative z-10 max-w-lg">
-                  <h2 className="text-3xl font-black italic tracking-tighter mb-4">Welcome, Bioregional Explorer.</h2>
-                  <p className="text-slate-400 leading-relaxed">
-                    This dashboard is your interface with reality. Move beyond the "Static Screen" of modern consumption and start mapping the "Life-Place" where you stand. Every tool in the sidebar is a lever for systemic health.
-                  </p>
-                  <button onClick={() => setActiveTab('watershed')} className="mt-8 flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all">
-                    Start Mapping <ChevronRight size={16} />
-                  </button>
-                </div>
-                <Globe className="absolute -bottom-10 -right-10 w-64 h-64 text-white opacity-5 pointer-events-none" />
-              </div>
-
-              {/* Quick Links */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-3xl border border-slate-200">
-                  <h3 className="font-black uppercase italic text-xs text-slate-400 mb-4">Latest Study Guide Chapter</h3>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-16 bg-slate-100 rounded border border-slate-200 flex items-center justify-center"><BookOpen size={20} className="text-slate-400" /></div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-sm">Chapter 5: Deep Time & Ancestral Legacy</h4>
-                      <p className="text-xs text-slate-500 mt-1">Filtering daily choices for the next 7 generations.</p>
-                      <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                        <div className="bg-amber-500 w-3/4 h-full" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-200">
-                  <h3 className="font-black uppercase italic text-xs text-slate-400 mb-4">Campus Activity Log</h3>
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> You logged "Tool Library" to the Asset Map.
-                    </li>
-                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> New "Watershed Yield" calculated.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'watershed' && <WatershedNavigator />}
-          {activeTab === 'soil' && <CompostMaker />}
-          {activeTab === 'assets' && <AssetMapper />}
-          {activeTab === 'social' && <ConflictGuide />}
-          {activeTab === 'design' && <GuildPlanner />}
-          {activeTab === 'economy' && <EconomyMapper />}
-          {activeTab === 'legacy' && <AncestralLegacy />}
-
+        <div className="p-10 max-w-6xl mx-auto min-h-screen">
+          {renderContent()}
         </div>
+
+        <footer className="p-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-400">
+           <div className="flex items-center gap-2">
+             <Wind size={16} />
+             <span className="text-[10px] font-black uppercase tracking-widest italic">"The problem is the solution."</span>
+           </div>
+           <span className="text-[10px] font-bold uppercase tracking-widest tracking-[0.5em]">Dancing with the Elephant • 2026</span>
+        </footer>
       </main>
     </div>
   );
