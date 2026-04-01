@@ -4,238 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bioregional Trailblazer HUB</title>
-    <!-- Tailwind CSS for styling -->
+    <!-- CSS Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React and ReactDOM -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,400;1,800&display=swap" rel="stylesheet">
+    
+    <!-- React & Babel CDNs -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,400;1,800&display=swap');
-        
         body { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Playfair Display', serif; }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
-
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-50">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        // --- ICON HELPER COMPONENT ---
-        const Icon = ({ name, size = 20, className = "" }) => {
+        // Custom Icon Component for UMD Lucide
+        const LucideIcon = ({ name, size = 20, className = "" }) => {
             useEffect(() => {
-                lucide.createIcons();
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
             }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
-        // --- SUB-COMPONENTS: THE TOOLS ---
-
         const Card = ({ children, className = "" }) => (
-            <div className={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
+            <div class={`bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
                 {children}
             </div>
         );
 
-        // 1. Watershed Navigator
-        const WatershedNavigator = () => {
-            const [roofSize, setRoofSize] = useState(1000);
-            const [annualRainfall, setAnnualRainfall] = useState(30);
-            const [efficiency, setEfficiency] = useState(0.85);
+        // --- INDIVIDUAL TOOLS ---
 
-            const potentialHarvest = useMemo(() => {
-                return Math.round(roofSize * annualRainfall * 0.623 * efficiency);
-            }, [roofSize, annualRainfall, efficiency]);
-
+        const WatershedTool = () => {
+            const [roof, setRoof] = useState(1000);
+            const [rain, setRain] = useState(30);
+            const yieldVal = Math.round(roof * rain * 0.623 * 0.85);
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="p-6 space-y-4">
-                            <h3 className="font-black flex items-center gap-2 text-blue-600 uppercase tracking-wider text-sm">
-                                <Icon name="calculator" /> Yield Inputs
+                <div class="space-y-6 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <Card class="p-8 space-y-4">
+                            <h3 class="font-black text-blue-600 uppercase text-xs tracking-widest flex items-center gap-2">
+                                <LucideIcon name="droplets" /> Site Parameters
                             </h3>
-                            <div className="space-y-4">
+                            <div class="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Catchment Area (sq ft)</label>
-                                    <input type="number" value={roofSize} onChange={e => setRoofSize(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Roof Size (sq ft)</label>
+                                    <input type="number" value={roof} onChange={e => setRoof(e.target.value)} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Annual Rain (inches)</label>
-                                    <input type="number" value={annualRainfall} onChange={e => setAnnualRainfall(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Surface Efficiency</label>
-                                    <select value={efficiency} onChange={e => setEfficiency(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none">
-                                        <option value={0.95}>Metal Roof (95%)</option>
-                                        <option value={0.85}>Asphalt Shingle (85%)</option>
-                                        <option value={0.50}>Pavement (50%)</option>
-                                    </select>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Annual Rainfall (inches)</label>
+                                    <input type="number" value={rain} onChange={e => setRain(e.target.value)} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" />
                                 </div>
                             </div>
                         </Card>
-                        <div className="bg-blue-600 text-white p-10 rounded-3xl flex flex-col items-center justify-center text-center shadow-lg">
-                            <span className="text-xs font-black uppercase tracking-[0.2em] opacity-80">Annual Water Yield</span>
-                            <div className="text-6xl font-black my-2 tabular-nums">{potentialHarvest.toLocaleString()}</div>
-                            <span className="text-xl font-bold opacity-90">Gallons / Year</span>
+                        <div class="bg-blue-600 rounded-[2rem] p-10 text-white flex flex-col justify-center text-center shadow-xl">
+                            <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Calculated Yield</span>
+                            <div class="text-6xl font-black my-2">{yieldVal.toLocaleString()}</div>
+                            <span class="text-xl font-bold opacity-80">Gallons / Year</span>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // 2. Compost Pile Maker
-        const CompostMaker = () => {
-            const [inputs, setInputs] = useState({ browns: 3, greens: 2, activators: 1 });
-            const fitness = useMemo(() => {
-                if (inputs.browns < inputs.greens) return { text: "Nitrogen Heavy", color: "text-amber-500", bg: "bg-amber-50" };
-                if (inputs.browns > (inputs.greens + inputs.activators) * 3) return { text: "Carbon Heavy", color: "text-blue-400", bg: "bg-blue-50" };
-                return { text: "Optimized 3-2-1", color: "text-emerald-500", bg: "bg-emerald-50" };
-            }, [inputs]);
-
+        const CompostTool = () => {
+            const [browns, setBrowns] = useState(3);
+            const [greens, setGreens] = useState(2);
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <Card className="p-8 grid md:grid-cols-2 gap-10">
-                        <div className="space-y-8">
-                            <h3 className="font-black flex items-center gap-2 text-emerald-600 uppercase tracking-wider text-sm"><Icon name="layers" /> Balancer</h3>
-                            <div className="space-y-6">
-                                {Object.keys(inputs).map(key => (
-                                    <div key={key}>
-                                        <div className="flex justify-between text-xs font-black mb-2 uppercase text-slate-500 tracking-widest">
-                                            <span>{key}</span>
-                                            <span className="text-emerald-700">{inputs[key]} Parts</span>
-                                        </div>
-                                        <input type="range" min="0" max="10" step="1" value={inputs[key]} onChange={e => setInputs({...inputs, [key]: parseInt(e.target.value)})} className="w-full h-2 bg-slate-100 rounded-lg accent-emerald-600" />
+                <Card class="p-10 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-12 items-center">
+                        <div class="space-y-8">
+                            <h3 class="font-black text-emerald-600 uppercase text-xs tracking-widest flex items-center gap-2">
+                                <LucideIcon name="sprout" /> 3:2:1 Balancer
+                            </h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-black uppercase text-slate-400 mb-2">
+                                        <span>Carbon (Browns)</span>
+                                        <span class="text-emerald-600">{browns} Parts</span>
                                     </div>
-                                ))}
+                                    <input type="range" min="1" max="10" value={browns} onChange={e => setBrowns(e.target.value)} class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" />
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-black uppercase text-slate-400 mb-2">
+                                        <span>Nitrogen (Greens)</span>
+                                        <span class="text-emerald-600">{greens} Parts</span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value={greens} onChange={e => setGreens(e.target.value)} class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-600" />
+                                </div>
                             </div>
                         </div>
-                        <div className={`flex flex-col items-center justify-center p-8 rounded-3xl border border-slate-100 ${fitness.bg}`}>
-                            <Icon name="thermometer" size={48} className={fitness.color} />
-                            <span className={`text-xl font-black uppercase italic mt-4 ${fitness.color}`}>{fitness.text}</span>
-                            <p className="text-xs text-slate-500 mt-2 text-center">Maintain 135°F - 160°F</p>
+                        <div class="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 text-center">
+                            <div class="flex justify-center mb-4 text-emerald-600"><LucideIcon name="thermometer" size={48} /></div>
+                            <h4 class="text-xl font-black text-emerald-900 italic">Target: 135°F - 160°F</h4>
+                            <p class="text-xs text-emerald-700 mt-2 leading-relaxed">Turn on Day 4, then every 2 days for 18 total days (Berkeley Method).</p>
                         </div>
-                    </Card>
-                </div>
-            );
-        };
-
-        // 3. Asset Mapper
-        const AssetMapper = () => {
-            const [assets, setAssets] = useState([
-                { id: 1, name: 'Watershed Council', category: 'Nature', strength: 3 },
-                { id: 2, name: 'Tool Library', category: 'Tools', strength: 2 }
-            ]);
-            const [name, setName] = useState('');
-            const add = () => { if(name) { setAssets([{ id: Date.now(), name, category: 'Skill', strength: 2 }, ...assets]); setName(''); }};
-
-            return (
-                <div className="space-y-6 animate-fade-in">
-                    <Card className="p-6 flex flex-col md:flex-row gap-3">
-                        <input value={name} onChange={e => setName(e.target.value)} placeholder="Asset Name..." className="flex-1 p-3 rounded-xl border border-slate-200 outline-none" />
-                        <button onClick={add} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-black uppercase text-xs">Log Asset</button>
-                    </Card>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {assets.map(a => (
-                            <Card key={a.id} className="p-5 flex justify-between items-center group">
-                                <div>
-                                    <p className="font-black text-slate-800">{a.name}</p>
-                                    <p className="text-[10px] uppercase font-bold text-slate-400">{a.category}</p>
-                                </div>
-                                <div className="flex gap-1">
-                                    {[1,2,3].map(i => <div key={i} className={`w-2 h-2 rounded-full ${i <= a.strength ? 'bg-indigo-500' : 'bg-slate-100'}`} />)}
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        // 4. Conflict Guide
-        const ConflictGuide = () => {
-            const [step, setStep] = useState(0);
-            const prompts = [
-                "What is the one shared value you and your opponent both want to protect?",
-                "What systemic stress might be causing their behavior?",
-                "What is the smallest gesture you can make to restore trust today?"
-            ];
-
-            return (
-                <Card className="bg-neutral-900 text-white p-10 animate-fade-in">
-                    <h3 className="text-rose-500 font-black uppercase tracking-widest text-sm mb-6">Social Permaculture</h3>
-                    <p className="text-2xl font-light italic mb-8">"{prompts[step]}"</p>
-                    <textarea className="w-full bg-neutral-800 border border-neutral-700 rounded-2xl p-5 text-neutral-200 mb-8 outline-none" rows="3" placeholder="Reflect..."></textarea>
-                    <div className="flex justify-between">
-                        <button onClick={() => setStep(Math.max(0, step - 1))} className="text-neutral-500 font-black uppercase text-xs">Back</button>
-                        <button onClick={() => setStep(Math.min(2, step + 1))} className="bg-white text-neutral-900 px-8 py-3 rounded-full font-black uppercase text-xs">Next</button>
                     </div>
                 </Card>
             );
         };
 
-        // 5. Guild Planner
-        const GuildPlanner = () => {
-            const [guild, setGuild] = useState(['Apple Tree']);
-            const supports = ['Comfrey', 'Clover', 'Nasturtium', 'Yarrow', 'Chives'];
-
-            return (
-                <div className="space-y-8 animate-fade-in text-center">
-                    <Card className="bg-stone-50 p-12 flex flex-col items-center">
-                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4"><Icon name="tree-deciduous" size={48} className="text-emerald-700" /></div>
-                        <h3 className="text-3xl font-black uppercase italic text-emerald-900">{guild[0]}</h3>
-                        <div className="flex flex-wrap justify-center gap-2 mt-8">
-                            {guild.slice(1).map(g => <div key={g} className="bg-white px-5 py-2 rounded-full border border-emerald-100 text-xs font-black text-emerald-800 flex items-center gap-2 shadow-sm"><Icon name="check-circle-2" size={14} className="text-emerald-500" /> {g}</div>)}
-                        </div>
-                    </Card>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        {supports.map(s => <button key={s} onClick={() => !guild.includes(s) && setGuild([...guild, s])} className={`p-4 rounded-2xl border text-sm font-bold ${guild.includes(s) ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 hover:border-emerald-300'}`}>+ {s}</button>)}
-                    </div>
-                </div>
-            );
-        };
-
-        // 6. Economy Mapper
-        const EconomyMapper = () => {
+        const EconomyTool = () => {
             const [global, setGlobal] = useState(1200);
             const [local, setLocal] = useState(400);
-            const retention = Math.round((local / (global + local)) * 100);
-
+            const rate = Math.round((local / (global + local)) * 100);
             return (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="p-8 space-y-6">
-                            <h3 className="font-black text-rose-500 uppercase tracking-wider text-sm">Leakage Audit</h3>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Global Spend</label>
-                                <input type="number" value={global} onChange={e => setGlobal(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Local Spend</label>
-                                <input type="number" value={local} onChange={e => setLocal(Number(e.target.value))} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200" />
+                <div class="space-y-6 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <Card class="p-8 space-y-6">
+                            <h3 class="font-black text-rose-500 uppercase text-xs tracking-widest">Dollar Leakage Audit</h3>
+                            <div class="space-y-4">
+                                <input type="number" value={global} onChange={e => setGlobal(Number(e.target.value))} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Global Monthly Spend" />
+                                <input type="number" value={local} onChange={e => setLocal(Number(e.target.value))} class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" placeholder="Local Monthly Spend" />
                             </div>
                         </Card>
-                        <div className="bg-slate-900 text-white p-10 rounded-3xl flex flex-col justify-center">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Retention Score</span>
-                            <div className="text-7xl font-black my-4">{retention}%</div>
-                            <div className="w-full bg-slate-800 h-4 rounded-full overflow-hidden flex">
-                                <div className="bg-emerald-500 h-full" style={{ width: `${retention}%` }} />
+                        <div class="bg-slate-900 rounded-[2.5rem] p-10 text-white flex flex-col justify-center shadow-2xl relative overflow-hidden">
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Retention Score</span>
+                            <div class="text-7xl font-black my-4">{rate}%</div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden flex">
+                                <div class="bg-emerald-500 h-full" style={{ width: `${rate}%` }}></div>
+                                <div class="bg-rose-500 h-full" style={{ width: `${100-rate}%` }}></div>
                             </div>
                         </div>
                     </div>
@@ -243,81 +146,66 @@
             );
         };
 
-        // 7. Ancestral Legacy
-        const AncestralLegacy = () => {
-            const [val, setVal] = useState('');
+        const LegacyTool = () => {
+            const [input, setInput] = useState('');
             const [done, setDone] = useState(false);
-
             return (
-                <Card className="bg-stone-800 text-stone-100 p-12 border border-stone-700 animate-fade-in text-center min-h-[400px] flex flex-col justify-center">
+                <Card class="bg-stone-800 p-12 text-center text-stone-100 animate-fade-in border-none">
                     {!done ? (
-                        <div className="space-y-10">
-                            <Icon name="history" size={48} className="text-amber-500 mx-auto" />
-                            <h3 className="text-3xl font-light italic">The Breath of the Past</h3>
-                            <input value={val} onChange={e => setVal(e.target.value)} className="w-full bg-transparent border-b-2 border-stone-600 text-center p-3 text-xl italic outline-none focus:border-amber-500" placeholder="A skill, a love..." />
-                            <button onClick={() => setDone(true)} className="bg-amber-600 text-stone-900 px-12 py-4 rounded-full font-black uppercase text-xs">Enter the Stream</button>
+                        <div class="max-w-xl mx-auto space-y-8">
+                            <div class="text-amber-500 flex justify-center"><LucideIcon name="history" size={48} /></div>
+                            <h3 class="text-3xl font-serif italic">What gift from the ancestors do you carry into today?</h3>
+                            <input value={input} onChange={e => setInput(e.target.value)} class="w-full bg-transparent border-b border-stone-600 p-4 text-xl outline-none italic text-amber-200 focus:border-amber-500 text-center" placeholder="A value, a skill, a memory..." />
+                            <button onClick={() => setDone(true)} class="bg-amber-600 text-stone-900 px-12 py-3 rounded-full font-black uppercase text-xs tracking-widest">Enter the Stream</button>
                         </div>
                     ) : (
-                        <div className="space-y-8">
-                            <Icon name="heart" size={48} className="text-rose-500 mx-auto" />
-                            <div className="p-10 bg-stone-900/60 rounded-3xl border border-stone-700 text-left italic text-stone-300 text-lg leading-relaxed shadow-inner border-l-4 border-l-amber-600">
-                                "I acknowledge the gift of <span className="text-amber-200 font-bold underline">{val}</span> passed down from the ancestors. Today, I commit my biophilic energy to the restoration of this land."
+                        <div class="max-w-2xl mx-auto space-y-8">
+                            <div class="text-rose-500 flex justify-center"><LucideIcon name="heart" size={48} /></div>
+                            <div class="p-10 bg-stone-900/50 rounded-3xl border-l-4 border-amber-600 text-left">
+                                <p class="text-xl italic font-serif leading-relaxed">
+                                    "I acknowledge the gift of <span class="text-amber-200 underline">{input}</span>. Today, in this moment of metacrisis, I commit my biophilic energy to the restoration of this Life-Place for the next seven generations."
+                                </p>
                             </div>
-                            <button onClick={() => setDone(false)} className="text-stone-500 hover:text-white font-black uppercase text-[10px] tracking-widest">New vision</button>
+                            <button onClick={() => setDone(false)} class="text-stone-500 uppercase text-[10px] font-black tracking-widest hover:text-white transition-colors">Start New Cycle</button>
                         </div>
                     )}
                 </Card>
             );
         };
 
-        // --- MAIN APP ---
+        // --- MAIN APP SHELL ---
 
         function App() {
-            const [activeTab, setActiveTab] = useState('dashboard');
+            const [tab, setTab] = useState('overview');
 
-            const menuItems = [
-                { id: 'dashboard', label: 'Overview', icon: 'layout-dashboard', color: 'text-slate-500' },
+            const menu = [
+                { id: 'overview', label: 'Overview', icon: 'layout-dashboard', color: 'text-slate-500' },
                 { id: 'watershed', label: 'Ecology', icon: 'droplets', color: 'text-blue-500' },
                 { id: 'soil', label: 'Fertility', icon: 'sprout', color: 'text-emerald-500' },
-                { id: 'assets', label: 'Resources', icon: 'map-pin', color: 'text-indigo-500' },
-                { id: 'social', label: 'Social', icon: 'users', color: 'text-purple-500' },
-                { id: 'design', label: 'Design', icon: 'tree-deciduous', color: 'text-emerald-600' },
                 { id: 'economy', label: 'Wallet', icon: 'trending-down', color: 'text-rose-500' },
-                { id: 'legacy', label: 'Vision', icon: 'hourglass', color: 'text-amber-500' },
+                { id: 'legacy', label: 'Vision', icon: 'hourglass', color: 'text-amber-500' }
             ];
 
-            const renderContent = () => {
-                switch (activeTab) {
-                    case 'watershed': return <WatershedNavigator />;
-                    case 'soil': return <CompostMaker />;
-                    case 'assets': return <AssetMapper />;
-                    case 'social': return <ConflictGuide />;
-                    case 'design': return <GuildPlanner />;
-                    case 'economy': return <EconomyMapper />;
-                    case 'legacy': return <AncestralLegacy />;
+            const render = () => {
+                switch(tab) {
+                    case 'watershed': return <WatershedTool />;
+                    case 'soil': return <CompostTool />;
+                    case 'economy': return <EconomyTool />;
+                    case 'legacy': return <LegacyTool />;
                     default: return (
-                        <div className="space-y-8 animate-fade-in">
-                            <div className="grid md:grid-cols-3 gap-6">
-                                <Card className="p-6 flex items-center gap-4 border-l-4 border-l-blue-500">
-                                    <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Icon name="droplets" /></div>
-                                    <div><p className="text-[10px] font-black uppercase text-slate-400">Water Potential</p><p className="text-xl font-black">18,450 Gal</p></div>
-                                </Card>
-                                <Card className="p-6 flex items-center gap-4 border-l-4 border-l-emerald-500">
-                                    <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600"><Icon name="sprout" /></div>
-                                    <div><p className="text-[10px] font-black uppercase text-slate-400">Soil Fitness</p><p className="text-xl font-black">Optimum</p></div>
-                                </Card>
-                                <Card className="p-6 flex items-center gap-4 border-l-4 border-l-indigo-500">
-                                    <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600"><Icon name="trending-down" /></div>
-                                    <div><p className="text-[10px] font-black uppercase text-slate-400">Local Retention</p><p className="text-xl font-black">25% Shift</p></div>
-                                </Card>
+                        <div class="space-y-8 animate-fade-in">
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <Card class="p-6 border-l-4 border-blue-500"><div class="flex items-center gap-4"><div class="p-3 bg-blue-50 text-blue-600 rounded-2xl"><LucideIcon name="droplets" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Water potential</p><p class="text-xl font-black">18.4K Gal</p></div></div></Card>
+                                <Card class="p-6 border-l-4 border-emerald-500"><div class="flex items-center gap-4"><div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><LucideIcon name="sprout" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Soil Fitness</p><p class="text-xl font-black">Optimum</p></div></div></Card>
+                                <Card class="p-6 border-l-4 border-rose-500"><div class="flex items-center gap-4"><div class="p-3 bg-rose-50 text-rose-600 rounded-2xl"><LucideIcon name="trending-up" /></div><div><p class="text-[10px] font-black text-slate-400 uppercase">Retention</p><p class="text-xl font-black">+12.4%</p></div></div></Card>
                             </div>
-                            <div className="bg-slate-900 text-white p-12 rounded-[2rem] relative overflow-hidden shadow-2xl">
-                                <div className="relative z-10 max-w-lg">
-                                    <h2 className="text-4xl font-black italic tracking-tighter mb-6 leading-tight">Welcome, Bioregional Explorer.</h2>
-                                    <p className="text-slate-400 text-lg leading-relaxed mb-10">This dashboard is your interface with the living world. Move beyond the static screen and start mapping the "Life-Place" where you stand.</p>
-                                    <button onClick={() => setActiveTab('watershed')} className="flex items-center gap-3 bg-white text-slate-900 px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all shadow-lg">Activate Action Map <Icon name="arrow-right" size={18} /></button>
+                            <div class="bg-slate-900 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl">
+                                <div class="max-w-xl relative z-10">
+                                    <h2 class="text-5xl font-black italic tracking-tighter mb-6 leading-none">Welcome Explorer.</h2>
+                                    <p class="text-slate-400 text-lg leading-relaxed mb-10">This dashboard is your interface with the living world. Move beyond the static screen and start mapping the <strong>Life-Place</strong> where you stand.</p>
+                                    <button onClick={() => setTab('watershed')} class="bg-white text-slate-900 px-10 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform flex items-center gap-2">Activate Action Map <LucideIcon name="arrow-right" size={16} /></button>
                                 </div>
-                                <Icon name="globe" size={300} className="absolute -bottom-20 -right-20 text-white opacity-5 pointer-events-none" />
+                                <div class="absolute -bottom-20 -right-20 opacity-5 text-white pointer-events-none"><LucideIcon name="globe" size={400} /></div>
                             </div>
                         </div>
                     );
@@ -325,28 +213,34 @@
             };
 
             return (
-                <div className="min-h-screen bg-slate-100 flex font-sans text-slate-900">
-                    <aside className="w-20 md:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
-                        <div className="p-8 border-b border-slate-50 hidden md:block">
-                            <div className="flex items-center gap-3"><div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white"><Icon name="globe" /></div><div><span className="font-black uppercase tracking-tighter text-sm italic">Trailblazer</span></div></div>
+                <div class="min-h-screen flex text-slate-900">
+                    <aside class="w-20 md:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
+                        <div class="p-8 border-b border-slate-50 hidden md:block">
+                            <div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center"><LucideIcon name="globe" /></div><span class="font-black uppercase tracking-tighter italic">Trailblazer</span></div>
                         </div>
-                        <nav className="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto">
-                            {menuItems.map(item => (
-                                <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${activeTab === item.id ? 'bg-slate-900 text-white shadow-xl translate-x-1' : 'text-slate-500 hover:bg-slate-50'}`}>
-                                    <span className={activeTab === item.id ? 'text-white' : item.color}><Icon name={item.icon} /></span>
-                                    <span className="hidden md:block font-black text-xs uppercase tracking-widest">{item.label}</span>
+                        <nav class="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto">
+                            {menu.map(i => (
+                                <button key={i.id} onClick={() => setTab(i.id)} class={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${tab === i.id ? 'bg-slate-900 text-white shadow-xl translate-x-1' : 'text-slate-500 hover:bg-slate-100'}`}>
+                                    <span class={tab === i.id ? 'text-white' : i.color}><LucideIcon name={i.icon} /></span>
+                                    <span class="hidden md:block text-[10px] font-black uppercase tracking-widest">{i.label}</span>
                                 </button>
                             ))}
                         </nav>
                     </aside>
-                    <main className="flex-1 overflow-y-auto">
-                        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 py-5 sticky top-0 z-20 flex justify-between items-center">
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight italic">Bioregional HUB</h1>
-                            <div className="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black">U</div>
+                    <main class="flex-1 overflow-y-auto bg-slate-50/30">
+                        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 py-6 sticky top-0 z-20 flex justify-between items-center">
+                            <h1 class="text-xl font-black italic tracking-tight">Bioregional HUB</h1>
+                            <div class="hidden md:flex gap-4">
+                                <div class="bg-slate-100 px-5 py-2 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div> Local Watershed: <span class="text-slate-900">Mapped</span>
+                                </div>
+                            </div>
                         </header>
-                        <div className="p-10 max-w-6xl mx-auto min-h-screen">
-                            {renderContent()}
-                        </div>
+                        <div class="p-10 max-w-6xl mx-auto min-h-screen">{render()}</div>
+                        <footer class="p-10 border-t border-slate-200 text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex justify-between">
+                            <span>Dancing with the Elephant</span>
+                            <span>v2.0 Systems-Health</span>
+                        </footer>
                     </main>
                 </div>
             );
